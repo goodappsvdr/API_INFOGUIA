@@ -1,4 +1,6 @@
-﻿namespace Api.Infrastructure.Services.Interface
+﻿using Api.Shared.DTOs.Politics;
+
+namespace Api.Shared.Interface
 {
     public interface IPoliticsServices
     {

@@ -1,6 +1,8 @@
 ﻿using Api.Shared.DTOs.Identity.AspNetUsers;
+using Api.Shared.Identity;
+using Api.Shared.Jwt;
 
-namespace Api.Infrastructure.Services.Interface
+namespace Api.Shared.Interface
 {
     public interface IUsersServices
     {

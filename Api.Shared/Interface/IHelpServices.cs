@@ -1,6 +1,6 @@
 ﻿using Api.Shared.DTOs.Help;
 
-namespace Api.Infrastructure.Services.Interface
+namespace Api.Shared.Interface
 {
     public interface IHelpServices
     {

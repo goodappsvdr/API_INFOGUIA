@@ -27,10 +27,8 @@ global using Microsoft.OpenApi.Models;
 global using Api.Infrastructure.AutoMapper;
 global using Api.Infrastructure.Jwt;
 global using Api.Infrastructure.Services;
-global using Api.Infrastructure.Services.Interface;
 global using Api.Infrastructure.SignalR;
 global using Api.Infrastructure.Identity;
-global using Api.Infrastructure.Repository.Interface;
 global using Api.Infrastructure.Repository;
 
 // SHARED

@@ -1,4 +1,4 @@
-﻿namespace Api.Infrastructure.Jwt
+﻿namespace Api.Shared.Jwt
 {
     public class Jwt_Claims
     {
@@ -20,6 +20,7 @@
 
         public string RoleName { get; set; } = default!;
 
+        public int? TenantID { get; set; }
         //public string Expiration { get; set; } = default!;
     }
 }

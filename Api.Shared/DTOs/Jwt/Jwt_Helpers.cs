@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace Api.Infrastructure.Jwt
+namespace Api.Shared.Jwt
 {
     public static class Jwt_Helpers
     {
@@ -22,7 +22,8 @@ namespace Api.Infrastructure.Jwt
                 new Claim(ClaimTypes.Actor, user.Username.ToString()),
                 new(ClaimTypes.Email, user.Email.ToString()),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Expiration, DateTimeOffset.UtcNow.AddMinutes(30).ToUnixTimeSeconds().ToString())
+                new Claim(ClaimTypes.Expiration, DateTimeOffset.UtcNow.AddMinutes(30).ToUnixTimeSeconds().ToString()),
+                new Claim("TenantID", user.TenantID?.ToString() ?? string.Empty)
             };
             
             return Claims;

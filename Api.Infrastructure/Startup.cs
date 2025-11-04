@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Http.Connections;
+﻿
+using Api.Shared.Identity;
+using Api.Shared.Interface;
+using Microsoft.AspNetCore.Http.Connections;
 
 namespace Api.Infrastructure;
 public static class Startup
@@ -88,7 +91,8 @@ public static class Startup
         services.AddTransient<INotificationsServices, NotificationsServices>();
         services.AddTransient<IPoliticsServices, PoliticsServices>();
         services.AddTransient<IHelpServices, HelpServices>();
-     
+        services.AddScoped<ITenantService, TenantService>();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
         return services;
     }
     internal static IServiceCollection AddSignalRSettings(this IServiceCollection services)

@@ -1,4 +1,7 @@
-﻿namespace Api.Infrastructure.AutoMapper
+﻿using Api.Shared.Identity;
+using Api.Shared.Jwt;
+
+namespace Api.Infrastructure.AutoMapper
 {
     public class AutoMapperProfile : Profile
     {

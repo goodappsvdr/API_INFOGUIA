@@ -1,4 +1,6 @@
 ﻿using Api.Shared.DTOs.Identity.Roles;
+using Api.Shared.Identity;
+using Api.Shared.Interface;
 
 namespace Api.Infrastructure.Repository
 {

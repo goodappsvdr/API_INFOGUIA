@@ -1,5 +1,5 @@
 ﻿{
   "ConnectionStrings": {
-    "SQL": "Server = 179.43.114.86; Database = FAMIGLIAROSSI; User = FAMIGLIAROSSI; Password = FAMIGLIAROSSI*963; TrustServerCertificate = true"
+    "SQL": "Server = 147.93.176.131; Database = INFOGUIA; User = INFOGUIA; Password = INFOGUIA*963; TrustServerCertificate = true"
   }
 }

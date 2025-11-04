@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Api.Shared.Interface;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Api.Infrastructure.Services
 {

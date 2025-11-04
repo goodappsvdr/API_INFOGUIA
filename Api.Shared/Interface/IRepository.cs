@@ -1,5 +1,5 @@
 ﻿
-namespace Api.Infrastructure.Repository.Interface
+namespace Api.Shared.Interface
 {
     public interface IRepository<T> where T : class
     {

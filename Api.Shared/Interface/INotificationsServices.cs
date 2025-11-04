@@ -1,4 +1,6 @@
-﻿namespace Api.Infrastructure.Services.Interface
+﻿using Api.Shared.Models;
+
+namespace Api.Shared.Interface
 {
     public interface INotificationsServices
     {

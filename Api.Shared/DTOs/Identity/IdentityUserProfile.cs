@@ -1,4 +1,4 @@
-﻿namespace Api.Infrastructure.Identity
+﻿namespace Api.Shared.Identity
 {
     public class IdentityUserProfile : IdentityUser
     {
@@ -27,5 +27,7 @@
         public string? ChangePasswordToken { get; set; }
 
         public string? ConfirmEmailToken { get; set; }
+
+        public int? TenantID { get; set; }
     }
 }

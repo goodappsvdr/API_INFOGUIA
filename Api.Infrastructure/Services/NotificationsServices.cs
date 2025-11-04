@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Api.Shared.Interface;
+using AutoMapper;
 
 namespace Api.Infrastructure.Services
 {

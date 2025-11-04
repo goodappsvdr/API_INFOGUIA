@@ -1,4 +1,6 @@
-﻿namespace Api.Infrastructure.Services.Interface
+﻿using Api.Shared.DTOs.Emails;
+
+namespace Api.Shared.Interface
 {
     public interface IEmailServices
     {

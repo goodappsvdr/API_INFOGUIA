@@ -1,0 +1,38 @@
+------------------------------------------------------------------------------------------------------------------------------------------
+Para utlizar esta api:
+
+1)
+
+Ir a AppSettings.json que esta dentro de la carpeta api, en ConnectionStrings que tiene SQL, colocar en los siguientes datos:
+datasource: Su ServerName de sql,
+Initial Catalog: El nombre de la base de datos
+User ID y Password: las credenciales de inicio de sesion de su sql
+
+2)
+
+Ir a su sqlserver y crear la base de datos con el nombre que escribio en Initial Catalog
+
+3)
+
+En la consola de administrador de paquetes, selecionar Api.shared y ejeutar el siguiente comando
+Update-Database -context context
+
+------------------------------------------------------------------------------------------------------------------------------------------
+Comandos:
+
+Mapeo de la Base de Datos: 
+Scaffold-DbContext "Server =147.93.176.131; Database = INFOGUIA; User = INFOGUIA; Password = INFOGUIA*963; TrustServerCertificate = true" Microsoft.EntityFrameworkCore.SqlServer -o Models -ContextDir Data -Context Context -NoOnConfiguring -f
+Server : Su ServerName de sql,
+Database : El nombre de la base de datos
+User Id y Password: las credenciales de inicio de sesion de su sql
+
+Eliminar migraciones :
+
+Remove-Migration -context context
+
+Crear Migraciones: 
+
+Enable-Migrations
+Add-Migration InitialCreate -context context
+
+------------------------------------------------------------------------------------------------------------------------------------------

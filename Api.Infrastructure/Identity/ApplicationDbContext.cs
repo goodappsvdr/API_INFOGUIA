@@ -1,4 +1,6 @@
-﻿namespace Api.Infrastructure.Identity
+﻿using Api.Shared.Identity;
+
+namespace Api.Infrastructure.Identity
 {
     public class ApplicationDbContext : IdentityDbContext<IdentityUserProfile, IdentityRole, string>
     {

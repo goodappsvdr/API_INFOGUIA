@@ -1,7 +1,10 @@
 ﻿
+using Api.Shared.DTOs.Auth;
+using Api.Shared.DTOs.Identity.AspNetUsers;
 using Api.Shared.DTOs.Identity.Roles;
+using Api.Shared.Identity;
 
-namespace Api.Infrastructure.Repository.Interface
+namespace Api.Shared.Interface
 {
     public interface IIdentityRepository<T> : IRepository<T> where T : class
     {

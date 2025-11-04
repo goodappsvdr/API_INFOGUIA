@@ -1,4 +1,6 @@
-﻿namespace Api.Infrastructure.Services.Interface
+﻿using Api.Shared.DTOs.Auth;
+
+namespace Api.Shared.Interface
 {
     public interface IAuthServices
     {

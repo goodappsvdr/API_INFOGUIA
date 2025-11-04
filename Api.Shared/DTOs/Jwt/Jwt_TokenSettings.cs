@@ -1,4 +1,4 @@
-﻿namespace Api.Infrastructure.Jwt
+﻿namespace Api.Shared.Jwt
 {
     public class Jwt_AccessTokenSettings
     {

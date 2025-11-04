@@ -1,4 +1,6 @@
-﻿namespace Api.Infrastructure.Jwt
+﻿using Api.Shared.Jwt;
+
+namespace Api.Infrastructure.Jwt
 {
     public static class Jwt_AddJwtTokenServicesExtensions
     {

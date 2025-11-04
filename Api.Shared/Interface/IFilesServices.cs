@@ -1,4 +1,4 @@
-﻿namespace Api.Infrastructure.Services.Interface
+﻿namespace Api.Shared.Interface
 {
     public interface IFilesServices
     {

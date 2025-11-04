@@ -1,4 +1,6 @@
-﻿namespace Api.Infrastructure.Repository
+﻿using Api.Shared.Interface;
+
+namespace Api.Infrastructure.Repository
 {
     public class Repository<T> : IRepository<T> where T : class
     {

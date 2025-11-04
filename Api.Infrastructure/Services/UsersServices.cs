@@ -1,4 +1,7 @@
 ﻿using Api.Shared.DTOs.Identity.Roles;
+using Api.Shared.Identity;
+using Api.Shared.Interface;
+using Api.Shared.Jwt;
 
 namespace Api.Infrastructure.Services
 {
@@ -27,13 +30,15 @@ namespace Api.Infrastructure.Services
         public async Task<Jwt_Claims> GetClaimsAsync(string UsernName)
         {
 
-            AspNetUser userModel = await _identityRepository.GetAsync(filter: x => x.UserName == UsernName,
-                                                                      includes: x => x.Roles);
+            IdentityUserProfile userModel = await _identityRepository.GetIdentityUserByNameAsync(UsernName);
 
-
-
+            //var roles = await _identityRepository.GetIdentityUserRolesAsync(userModel); // (Deberás crear este método en IdentityRepository)
+                                                                                        // o modificar GetIdentityUserByNameAsync para que los incluya si es posible.
+                                                                                        // Por ahora, lo mapeamos sin roles para avanzar.
 
             Jwt_Claims Claims = _mapper.Map<Jwt_Claims>(userModel);
+
+
 
             return Claims;
         }

@@ -1,4 +1,5 @@
 ﻿using Api.Shared.DTOs.Help;
+using Api.Shared.Interface;
 
 namespace Api.Infrastructure.Services
 {

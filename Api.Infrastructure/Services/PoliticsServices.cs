@@ -1,4 +1,6 @@
-﻿namespace Api.Infrastructure.Services
+﻿using Api.Shared.Interface;
+
+namespace Api.Infrastructure.Services
 {
     public class PoliticsServices : IPoliticsServices
     {
