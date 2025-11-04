@@ -1,0 +1,22 @@
+﻿{
+  "AccessTokenSettings": {
+    "ValidateIssuerSigningKey": true,
+    "IssuerSigningKey": "OulKSABINSATERthEOSeSEOcHazaGigNapHoMpiQAccessToken",
+    "ValidateIssuer": true,
+    "ValidIssuer": "AccessTokenApi",
+    "ValidateAudience": true,
+    "ValidAudience": "AccessTokenClient",
+    "RequireExpirationTime": true,
+    "ValidateLifeTime": true
+  },
+  "RefreshTokenSettings": {
+    "ValidateIssuerSigningKey": true,
+    "IssuerSigningKey": "ASDsdsadsdfaoAdsfgFAsfbsOcHazaGigNapHoMpiQRefreshToken",
+    "ValidateIssuer": true,
+    "ValidIssuer": "RefreshTokenApi",
+    "ValidateAudience": true,
+    "ValidAudience": "RefreshTokenClient",
+    "RequireExpirationTime": true,
+    "ValidateLifeTime": true
+  }
+}

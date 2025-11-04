@@ -1,0 +1,14 @@
+﻿{
+  "SwaggerSettings": {
+    "Enable": true,
+    "Title": "InfoGuia",
+    "Version": "1.0.0",
+    "Description": "",
+    "ContactName": "",
+    "ContactEmail": "info@goodapps.com.ar",
+    "ContactUrl": "https://vortex.goodapps.com.ar/",
+    "License": true,
+    "LicenseName": "MIT License",
+    "LicenseUrl": "https://vortex.goodapps.com.ar/License"
+  }
+}

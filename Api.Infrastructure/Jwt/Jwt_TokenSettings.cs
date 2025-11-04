@@ -1,0 +1,32 @@
+﻿namespace Api.Infrastructure.Jwt
+{
+    public class Jwt_AccessTokenSettings
+    {
+        public bool ValidateIssuerSigningKey { get; set; }
+        public string IssuerSigningKey { get; set; } = string.Empty;
+
+        public bool ValidateIssuer { get; set; }
+        public string ValidIssuer { get; set; } = string.Empty;
+
+        public bool ValidateAudience { get; set; }
+        public string ValidAudience { get; set; } = string.Empty;
+
+        public bool RequireExpirationTime { get; set; }
+        public bool ValidateLifeTime { get; set; }
+    }
+
+    public class Jwt_RefreshTokenSettings
+    {
+        public bool ValidateIssuerSigningKey { get; set; }
+        public string IssuerSigningKey { get; set; } = string.Empty;
+
+        public bool ValidateIssuer { get; set; }
+        public string ValidIssuer { get; set; } = string.Empty;
+
+        public bool ValidateAudience { get; set; }
+        public string ValidAudience { get; set; } = string.Empty;
+
+        public bool RequireExpirationTime { get; set; }
+        public bool ValidateLifeTime { get; set; }
+    }
+}

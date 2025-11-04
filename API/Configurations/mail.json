@@ -1,0 +1,10 @@
+﻿{
+  "MailSettings": {
+    "DisplayName": "NombreDeEmpresa",
+    "From": "santiagobruno870@gmail.com",
+    "Host": "smtp.gmail.com",
+    "Password": "lgnpwwrrimfbyuxt",
+    "Port": 587,
+    "UserName": "santiagobruno870@gmail.com"
+  }
+}
