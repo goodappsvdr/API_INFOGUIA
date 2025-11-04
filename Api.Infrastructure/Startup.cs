@@ -13,7 +13,8 @@ public static class Startup
         services.AddHttpContextAccessor();
         services.AddSqlConnection(config);
         services.AddIdentitySettings();
-        services.AddJwtTokenServices(config);
+       // services.AddJwtTokenServices(config);
+        services.AddAuth0Authentication(config);
         services.AddCorsSettings();
         services.AddSignalRSettings();
         services.AddAutoMapperSettings();
@@ -28,6 +29,7 @@ public static class Startup
         app.UseRouting();
         app.UseHttpsRedirection();
         app.UseCors("CorsPolicy");
+        app.UseAuthentication();
         app.UseAuthorization();
         app.UseSignalR();
         app.UseSwaggerGen();
