@@ -13,15 +13,16 @@ namespace Api.Infrastructure.AutoMapper
             CreateMap<IdentityUserProfile, User_Update>().ReverseMap();
 
             CreateMap<IdentityUserProfile, User_Create>().ReverseMap();
-
-            CreateMap<AspNetUser, Jwt_Claims>()
-                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
-                 .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.PhoneNumber))
-                 .AfterMap((src, dest) =>
-                 {
-                     dest.RoleName = src.Roles.Select(x => x.Name).FirstOrDefault();
-                 })
-                 .ReverseMap();
+            CreateMap<IdentityUserProfile, Jwt_Claims>()
+         .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
+         .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.PhoneNumber))
+         .ForMember(dest => dest.TenantID, opt => opt.MapFrom(src => src.TenantID)) // <-- Mapea el TenantID
+         .AfterMap((src, dest) =>
+         {
+           //  dest.RoleName = src.Roles.Select(x => x.Name).FirstOrDefault();
+         })
+         .ReverseMap();
+   
             #endregion
 
             #region Notifications

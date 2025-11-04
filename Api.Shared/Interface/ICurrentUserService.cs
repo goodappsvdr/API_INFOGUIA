@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Api.Infrastructure.Services
+namespace Api.Shared.Interface
 {
     public interface ICurrentUserService
     {
