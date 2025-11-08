@@ -1,27 +1,15 @@
-﻿using Api.Shared.Interface;
+﻿using System;
+using System.Collections.Generic;
 using Api.Shared.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 
 namespace Api.Shared.Data;
 
 public partial class Context : DbContext
 {
-    private readonly ITenantService _tenantService;
-    private readonly int? _tenantId;
-    private readonly ICurrentUserService _currentUserService;
-    private readonly string? _currentUserId;
-
-    public Context(DbContextOptions<Context> options,
-                      ITenantService tenantService,
-                      ICurrentUserService currentUserService)
-           : base(options)
+    public Context(DbContextOptions<Context> options)
+        : base(options)
     {
-        _tenantService = tenantService;
-        _tenantId = _tenantService.GetTenantID();
-        _currentUserService = currentUserService;
-        _currentUserId = _currentUserService.GetUserID();
     }
 
 
@@ -64,32 +52,7 @@ public partial class Context : DbContext
     public virtual DbSet<Tenant> Tenants { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
-    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-    {
-        ApplyAuditInfo();
-        return base.SaveChangesAsync(cancellationToken);
-    }
 
-    // 4. AGREGA EL MÉTODO DE AUDITORÍA
-    private void ApplyAuditInfo()
-    {
-
-        var entries = ChangeTracker.Entries<IAuditableEntity>();
-
-        foreach (var entry in entries)
-        {
-            if (entry.State == EntityState.Added)
-            {
-                entry.Entity.CreatedAt = DateTime.UtcNow;
-                entry.Entity.CreatedByUserID = _currentUserId;
-            }
-            else if (entry.State == EntityState.Modified)
-            {
-                entry.Entity.ModifiedAt = DateTime.UtcNow;
-                entry.Entity.ModifiedByUserID = _currentUserId;
-            }
-        }
-    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Category>(entity =>
@@ -422,20 +385,8 @@ public partial class Context : DbContext
                 .HasConstraintName("FK_Users_Tenants");
         });
 
-        if (_tenantId.HasValue) // Si NO soy SuperAdmin
-        {
-            // Aplica el filtro a todas las tablas que lo necesiten
-            modelBuilder.Entity<Category>().HasQueryFilter(e => e.TenantId == _tenantId);
-            modelBuilder.Entity<Models.Directory>().HasQueryFilter(e => e.TenantId == _tenantId);
-            modelBuilder.Entity<Listing>().HasQueryFilter(e => e.TenantId == _tenantId);
-            modelBuilder.Entity<PaymentMethod>().HasQueryFilter(e => e.TenantId == _tenantId);
-            modelBuilder.Entity<Service>().HasQueryFilter(e => e.TenantId == _tenantId);
-            modelBuilder.Entity<Tag>().HasQueryFilter(e => e.TenantId == _tenantId);
-            modelBuilder.Entity<Tenant>().HasQueryFilter(e => e.TenantId == _tenantId);
-            modelBuilder.Entity<User>().HasQueryFilter(e => e.TenantId == _tenantId);
-        }
         OnModelCreatingPartial(modelBuilder);
     }
- 
+
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
