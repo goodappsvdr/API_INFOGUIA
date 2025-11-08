@@ -35,4 +35,7 @@ Crear Migraciones:
 Enable-Migrations
 Add-Migration InitialCreate -context context
 
+
+Add-Migration InitialMigrations1 -Context Context -OutputDir Migrations/Data
+Update-Database -Context Context -Connection  "Server=147.93.176.131;Database=INFOGUIA;User Id=INFOGUIA;Password=INFOGUIA*963;TrustServerCertificate=True;MultipleActiveResultSets=true"
 ------------------------------------------------------------------------------------------------------------------------------------------

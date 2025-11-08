@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Api.Shared.DTOs.Tenant;
+using System;
 using System.Collections.Generic;
 
 namespace Api.Shared.Models;
 
-public partial class ListingHour
+public partial class ListingHour : BaseEntity
 {
     public int ListingHourId { get; set; }
 
@@ -21,7 +22,5 @@ public partial class ListingHour
 
     public bool IsActive { get; set; }
 
-    public DateTime CreatedAt { get; set; }
 
-    public int? CreatedByUserId { get; set; }
 }

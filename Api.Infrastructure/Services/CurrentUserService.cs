@@ -1,21 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Api.Shared.Interface;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
 namespace Api.Infrastructure.Services
 {
     public class CurrentUserService : ICurrentUserService
     {
-        private readonly string? _userId;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public CurrentUserService(IHttpContextAccessor httpContextAccessor)
         {
-            // Leemos el ID del usuario desde el Claim del Token JWT
-            _userId = httpContextAccessor.HttpContext?.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+            _httpContextAccessor = httpContextAccessor;
         }
 
-        public string? GetUserID() => _userId;
+        public string? GetUserID()
+        {
+            // Obtener el usuario del contexto HTTP
+            var user = _httpContextAccessor.HttpContext?.User;
+
+            if (user == null)
+                return null;
+
+            // Intenta obtener el ID del usuario de los claims
+            // Puede estar en diferentes claims dependiendo de tu configuración JWT
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                      ?? user.FindFirst("sub")?.Value
+                      ?? user.FindFirst("userId")?.Value
+                      ?? user.FindFirst("id")?.Value;
+
+            return userId;
+        }
     }
 }

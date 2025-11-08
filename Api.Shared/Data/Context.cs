@@ -1,14 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Api.Shared.Interface;
 using Api.Shared.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
 
 namespace Api.Shared.Data;
 
 public partial class Context : DbContext
 {
-    public Context(DbContextOptions<Context> options)
-        : base(options)
+
+
+
+    public Context(DbContextOptions<Context> options) : base(options)
     {
     }
 
@@ -52,6 +55,31 @@ public partial class Context : DbContext
     public virtual DbSet<Tenant> Tenants { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
+
+    //public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    //{
+    //    ApplyAuditInfo();
+    //    return base.SaveChangesAsync(cancellationToken);
+    //}
+
+    //private void ApplyAuditInfo()
+    //{
+    //    var entries = ChangeTracker.Entries<IAuditableEntity>();
+
+    //    foreach (var entry in entries)
+    //    {
+    //        if (entry.State == EntityState.Added)
+    //        {
+    //            entry.Entity.CreatedAt = DateTime.UtcNow;
+    //            entry.Entity.CreatedByUserID = _currentUserId;
+    //        }
+    //        else if (entry.State == EntityState.Modified)
+    //        {
+    //            entry.Entity.ModifiedAt = DateTime.UtcNow;
+    //            entry.Entity.ModifiedByUserID = _currentUserId;
+    //        }
+    //    }
+    //}
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -145,13 +173,11 @@ public partial class Context : DbContext
             entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
             entity.Property(e => e.CityId).HasColumnName("CityID");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.CreatedByUserId).HasColumnName("CreatedByUserID");
             entity.Property(e => e.Email).HasMaxLength(255);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.Latitude).HasColumnType("decimal(9, 6)");
             entity.Property(e => e.LogoUrl).HasMaxLength(512);
             entity.Property(e => e.Longitude).HasColumnType("decimal(9, 6)");
-            entity.Property(e => e.ModifiedByUserId).HasColumnName("ModifiedByUserID");
             entity.Property(e => e.Name).HasMaxLength(255);
             entity.Property(e => e.ShortDescription).HasMaxLength(500);
             entity.Property(e => e.TenantId).HasColumnName("TenantID");
@@ -175,7 +201,6 @@ public partial class Context : DbContext
 
             entity.Property(e => e.ListingHourId).HasColumnName("ListingHourID");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.CreatedByUserId).HasColumnName("CreatedByUserID");
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.ListingId).HasColumnName("ListingID");
         });
@@ -189,7 +214,6 @@ public partial class Context : DbContext
             entity.Property(e => e.ListingImageId).HasColumnName("ListingImageID");
             entity.Property(e => e.Caption).HasMaxLength(255);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.CreatedByUserId).HasColumnName("CreatedByUserID");
             entity.Property(e => e.ImageUrl).HasMaxLength(512);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.ListingId).HasColumnName("ListingID");
@@ -211,7 +235,6 @@ public partial class Context : DbContext
 
             entity.Property(e => e.ListingPhoneId).HasColumnName("ListingPhoneID");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.CreatedByUserId).HasColumnName("CreatedByUserID");
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.ListingId).HasColumnName("ListingID");
             entity.Property(e => e.PhoneNumber).HasMaxLength(50);
@@ -234,7 +257,6 @@ public partial class Context : DbContext
 
             entity.Property(e => e.ListingSocialLinkId).HasColumnName("ListingSocialLinkID");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.CreatedByUserId).HasColumnName("CreatedByUserID");
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.ListingId).HasColumnName("ListingID");
             entity.Property(e => e.NetworkName).HasMaxLength(50);
@@ -257,7 +279,6 @@ public partial class Context : DbContext
 
             entity.Property(e => e.PaymentMethodId).HasColumnName("PaymentMethodID");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.CreatedByUserId).HasColumnName("CreatedByUserID");
             entity.Property(e => e.IconUrl).HasMaxLength(512);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.Name).HasMaxLength(100);
@@ -301,7 +322,6 @@ public partial class Context : DbContext
 
             entity.Property(e => e.ServiceId).HasColumnName("ServiceID");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.CreatedByUserId).HasColumnName("CreatedByUserID");
             entity.Property(e => e.IconUrl).HasMaxLength(512);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.Name).HasMaxLength(100);
@@ -384,6 +404,9 @@ public partial class Context : DbContext
                 .HasForeignKey(d => d.TenantId)
                 .HasConstraintName("FK_Users_Tenants");
         });
+
+        // NOTA: NO necesitamos filtros globales porque cada tenant tiene su propia base de datos
+        // Finbuckle automáticamente conecta a la base de datos correcta según el tenant
 
         OnModelCreatingPartial(modelBuilder);
     }

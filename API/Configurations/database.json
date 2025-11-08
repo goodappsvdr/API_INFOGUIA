@@ -1,5 +1,7 @@
 ﻿{
   "ConnectionStrings": {
-    "SQL": "Server = 147.93.176.131; Database = INFOGUIA; User = INFOGUIA; Password = INFOGUIA*963; TrustServerCertificate = true"
+    "DefaultConnection": "Server=147.93.176.131;Database=INFOGUIA;User Id=INFOGUIA;Password=INFOGUIA*963;TrustServerCertificate=True;MultipleActiveResultSets=true",
+    "TenantStoreConnection": "Server=147.93.176.131;Database=InfoGuia_TenantStore;User Id=InfoGuia_TenantStore;Password=InfoGuia_TenantStore*963;TrustServerCertificate=True;MultipleActiveResultSets=true"
   }
 }
+

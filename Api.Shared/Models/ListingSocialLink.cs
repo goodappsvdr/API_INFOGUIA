@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Api.Shared.DTOs.Tenant;
+using System;
 using System.Collections.Generic;
 
 namespace Api.Shared.Models;
 
-public partial class ListingSocialLink
+public partial class ListingSocialLink : BaseEntity
 {
     public int ListingSocialLinkId { get; set; }
 
@@ -17,7 +18,4 @@ public partial class ListingSocialLink
 
     public bool IsActive { get; set; }
 
-    public DateTime CreatedAt { get; set; }
-
-    public int? CreatedByUserId { get; set; }
 }

@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Api.Shared.DTOs.Tenant;
+using System;
 using System.Collections.Generic;
 
 namespace Api.Shared.Models;
 
-public partial class Service
+public partial class Service : BaseEntity
 {
     public int ServiceId { get; set; }
 
@@ -17,7 +18,5 @@ public partial class Service
 
     public bool IsActive { get; set; }
 
-    public DateTime CreatedAt { get; set; }
 
-    public int? CreatedByUserId { get; set; }
 }

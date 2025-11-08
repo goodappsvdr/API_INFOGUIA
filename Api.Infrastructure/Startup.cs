@@ -1,6 +1,8 @@
 ﻿
 using Api.Shared.Identity;
 using Api.Shared.Interface;
+using Finbuckle.MultiTenant;
+using Finbuckle.MultiTenant.Abstractions;
 using Microsoft.AspNetCore.Http.Connections;
 
 namespace Api.Infrastructure;
@@ -28,6 +30,8 @@ public static class Startup
         app.UseRouting();
         app.UseHttpsRedirection();
         app.UseCors("CorsPolicy");
+        app.UseMultiTenant();
+
         app.UseAuthorization();
         app.UseSignalR();
         app.UseSwaggerGen();
@@ -58,9 +62,34 @@ public static class Startup
     }
     internal static IServiceCollection AddSqlConnection(this IServiceCollection services, IConfiguration config)
     {
-        var connectionString = config.GetConnectionString("SQL");
-        services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
-        services.AddDbContext<Context>(options => options.UseSqlServer(connectionString));
+        var tenantStoreConnection = config.GetConnectionString("TenantStoreConnection");
+        services.AddDbContext<TenantDbContext>(options =>
+            options.UseSqlServer(tenantStoreConnection));
+
+        // Usar la ruta completa o el alias
+        services.AddMultiTenant<Api.Shared.DTOs.Tenant.TenantInfo>()
+            .WithHeaderStrategy("X-Tenant-ID")
+            .WithEFCoreStore<TenantDbContext, Api.Shared.DTOs.Tenant.TenantInfo>();
+
+        var defaultConnection = config.GetConnectionString("SQL");
+        services.AddDbContext<ApplicationDbContext>(options =>
+            options.UseSqlServer(defaultConnection));
+
+        services.AddDbContext<Context>((serviceProvider, options) =>
+        {
+            var tenantInfo = serviceProvider.GetService<IMultiTenantContextAccessor<Api.Shared.DTOs.Tenant.TenantInfo>>()
+                ?.MultiTenantContext?.TenantInfo;
+
+            if (tenantInfo?.ConnectionString != null)
+            {
+                options.UseSqlServer(tenantInfo.ConnectionString);
+            }
+            else
+            {
+                options.UseSqlServer(defaultConnection);
+            }
+        });
+
         return services;
     }
     internal static IServiceCollection AddCorsSettings(this IServiceCollection services)
