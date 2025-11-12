@@ -41,9 +41,9 @@ public partial class Listing
 
     public DateTime CreatedAt { get; set; }
 
-    public int? CreatedByUserId { get; set; }
+    public string? CreatedByUserId { get; set; }
 
     public DateTime? ModifiedAt { get; set; }
 
-    public int? ModifiedByUserId { get; set; }
+    public string? ModifiedByUserId { get; set; }
 }

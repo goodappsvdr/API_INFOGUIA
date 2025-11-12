@@ -1,4 +1,6 @@
-﻿
+﻿using Api.Infrastructure.Services.Cities;
+using Api.Infrastructure.Services.Listings;
+using Api.Infrastructure.Services.Province;
 using Api.Shared.Identity;
 using Api.Shared.Interface;
 using Microsoft.AspNetCore.Http.Connections;
@@ -95,6 +97,9 @@ public static class Startup
         services.AddTransient<IHelpServices, HelpServices>();
         services.AddScoped<ITenantService, TenantService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<ICitiesServices, CitiesServices>();
+        services.AddScoped<IListingsServices, ListingsServices>();
+
         return services;
     }
     internal static IServiceCollection AddSignalRSettings(this IServiceCollection services)
