@@ -235,5 +235,6 @@ namespace Api.Infrastructure.Services
 
         // Cambia la contraseña utilizando la anterior
         public async Task<IdentityResult> ChangePasswordAsync(IdentityUserProfile User, User_ChangePassword Model) => await _identityRepository.ChangePasswordAsync(User, Model);
+
     }
 }

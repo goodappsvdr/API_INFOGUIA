@@ -12,14 +12,13 @@ public partial class Context : DbContext
     {
     }
 
-
     public virtual DbSet<Category> Categories { get; set; }
 
     public virtual DbSet<City> Cities { get; set; }
 
     public virtual DbSet<Country> Countries { get; set; }
 
-    public virtual DbSet<Models.Directory> Directories { get; set; }
+    public virtual DbSet<DirectoryInfoGuia> Directories { get; set; }
 
     public virtual DbSet<Listing> Listings { get; set; }
 
@@ -117,7 +116,7 @@ public partial class Context : DbContext
             entity.Property(e => e.Name).HasMaxLength(100);
         });
 
-        modelBuilder.Entity<Models.Directory>(entity =>
+        modelBuilder.Entity<DirectoryInfoGuia>(entity =>
         {
             entity.HasKey(e => e.DirectoryId).HasName("PK__Director__3D93EF02310A129E");
 
@@ -145,13 +144,17 @@ public partial class Context : DbContext
             entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
             entity.Property(e => e.CityId).HasColumnName("CityID");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.CreatedByUserId).HasColumnName("CreatedByUserID");
+            entity.Property(e => e.CreatedByUserId)
+                .HasMaxLength(450)
+                .HasColumnName("CreatedByUserID");
             entity.Property(e => e.Email).HasMaxLength(255);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.Latitude).HasColumnType("decimal(9, 6)");
             entity.Property(e => e.LogoUrl).HasMaxLength(512);
             entity.Property(e => e.Longitude).HasColumnType("decimal(9, 6)");
-            entity.Property(e => e.ModifiedByUserId).HasColumnName("ModifiedByUserID");
+            entity.Property(e => e.ModifiedByUserId)
+                .HasMaxLength(450)
+                .HasColumnName("ModifiedByUserID");
             entity.Property(e => e.Name).HasMaxLength(255);
             entity.Property(e => e.ShortDescription).HasMaxLength(500);
             entity.Property(e => e.TenantId).HasColumnName("TenantID");

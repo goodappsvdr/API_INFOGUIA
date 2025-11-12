@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Api.Shared.Models;
 
-public partial class Directory
+public partial class DirectoryInfoGuia
 {
     public int DirectoryId { get; set; }
 
