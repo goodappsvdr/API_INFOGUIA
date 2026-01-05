@@ -1,240 +1,155 @@
-﻿using Api.Shared.DTOs.Identity.Roles;
-using Api.Shared.Identity;
-using Api.Shared.Interface;
-using Api.Shared.Jwt;
+﻿
+using Api.Shared.Models;
+
+
+using Api.Shared.DTOs.Auth;
 
 namespace Api.Infrastructure.Services
 {
-    public class UsersServices : IUsersServices
-    {
-        private readonly IIdentityRepository<AspNetUser> _identityRepository;
-        private readonly IFilesServices _filesServices;
-        private readonly IMapper _mapper;
-        public UsersServices(IIdentityRepository<AspNetUser> identityRepository, IFilesServices filesServices, IMapper mapper)
+	public class UsersServices : IUsersServices
+	{
+		private readonly ContextInfoGuia _context;
+		private readonly IMapper _mapper;
+
+		public UsersServices(ContextInfoGuia context, IMapper mapper)
+		{
+			_context = context;
+			_mapper = mapper;
+		}
+
+
+        public async Task<bool> LoginAsync(Auth_Login login)
         {
-            _identityRepository = identityRepository;
-            _filesServices = filesServices;
-            _mapper = mapper;
+            var user = await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x =>
+                    x.Email.ToLower() == login.Username.ToLower() &&
+                    x.IsActive == true);
+
+            if (user == null)
+                return false;
+
+            return user.PasswordHash == login.Password;
         }
 
-        // Verifica si el usuario esta activo
-        public async Task<bool> IsActive(string UserId) => _identityRepository.GetAsync(x => x.Id == UserId).Result.Active.Value;
 
-        // Verifica si el usuario esta eliminado
-        public async Task<bool> IsDeleted(string UserId) => _identityRepository.GetAsync(x => x.Id == UserId).Result.Delete.Value;
 
-        // Verifica si el usuario esta verificado
-        public async Task<bool> IsVerified(string UserId) => _identityRepository.GetAsync(x => x.Id == UserId).Result.EmailConfirmed;
+        //public async Task<bool> LoginAsync(Auth_Login login)
+        //{
+        //	var usuario = await _context.Users
+        //		.Where(x => x.Email == login.Username)
+        //		.FirstOrDefaultAsync();
 
-        // Obtiene los claims del usuario
-        public async Task<Jwt_Claims> GetClaimsAsync(string UsernName)
+        //	// Verifica si el usuario fue encontrado
+        //	if (usuario != null)
+        //	{
+        //		// Verifica las credenciales
+        //		if (usuario.Email == login.Username && usuario.PasswordHash == login.Password)
+        //		{
+        //			return true; // Credenciales correctas
+        //		}
+        //	}
+
+        //	return false; // Usuario no encontrado o credenciales incorrectas
+        //}
+
+
+        public async Task<Jwt_Claims> GetClaimsAsync(string username)
         {
+            var data = await (
+                from u in _context.Users.AsNoTracking()
+                join r in _context.Roles.AsNoTracking()
+                    on u.RoleId equals r.RoleId
+                where u.Email == username && u.IsActive
+                select new
+                {
+                    User = u,
+                    RoleName = r.Name,
+                    RoleId = r.RoleId
+                }
+            ).FirstOrDefaultAsync();
 
-            IdentityUserProfile userModel = await _identityRepository.GetIdentityUserByNameAsync(UsernName);
+            if (data == null)
+                return null;
 
-            //var roles = await _identityRepository.GetIdentityUserRolesAsync(userModel); // (Deberás crear este método en IdentityRepository)
-                                                                                        // o modificar GetIdentityUserByNameAsync para que los incluya si es posible.
-                                                                                        // Por ahora, lo mapeamos sin roles para avanzar.
-
-            Jwt_Claims Claims = _mapper.Map<Jwt_Claims>(userModel);
-
-
-
-            return Claims;
-        }
-
-        // Obtiene el modelo de IdentityUser por el nombre
-        public async Task<IdentityUserProfile> GetIdentityUserByNameAsync(string Name) => await _identityRepository.GetIdentityUserByNameAsync(Name);
-
-        // Obtiene el modelo de IdentityUser por el email
-        public async Task<IdentityUserProfile> GetIdentityUserByEmailAsync(string Email) => await _identityRepository.GetIdentityUserByEmailAsync(Email);
-
-        // Obtiene el modelo de IdentityUser por el id
-        public async Task<IdentityUserProfile> GetIdentityUserByIdAsync(string Id) => await _identityRepository.GetIdentityUserByIdAsync(Id);
-
-        // Agrega un nuevo usuario
-        public async Task<IdentityResult> AddAsync(User_Create CreateModel)
-        {
-            try
+            Jwt_Claims claim = new Jwt_Claims
             {
-                IdentityUserProfile User = _mapper.Map<IdentityUserProfile>(CreateModel);
-                User.Photo = "";
-                User.Delete = false;
-                User.Active = true;
+                UserId = data.User.UserId,
+                Email = data.User.Email,
+                FirstName = data.User.FirstName,
+                LastName = data.User.LastName,
+                TenantId = data.User.TenantId,
+                RoleId = data.RoleId,
+                RoleName = data.RoleName,
+                Status = data.User.IsActive ? "Activo" : "Inactivo"
+            };
 
-                var createUserResult = await _identityRepository.AddUserAsync(User, CreateModel.Password);
+            claim.BranchOffices = await (
+                from us in _context.BranchsUsers
+                join bo in _context.BranchsOffices
+                    on us.BranchOfficeId equals bo.BranchOfficeId
+                where us.UserId == data.User.UserId
+                select new Jwt_Claims_BracnhOffice
+                {
+                    BranchId = bo.BranchOfficeId ?? 0,
+                    Description = bo.Name,
+                    PointSale = bo.SalesPoint
+                }
+            ).ToListAsync();
 
-                if (!createUserResult.Succeeded) return IdentityResult.Failed();
-
-                var userRoleResult = await _identityRepository.AddRoleToUser(User, new Role_Create("User"));
-
-                if(!userRoleResult.Succeeded) return IdentityResult.Failed();
-
-                return IdentityResult.Success;
-            }
-            catch
-            {
-                return IdentityResult.Failed();
-            }
-
+            return claim;
         }
 
-        // Modifica un usuario
-        public async Task<IdentityResult> UpdateAsync(User_Update UpdateModel, Jwt_Claims Claims)
-        {
-            try
-            {
-                IdentityUserProfile User = await _identityRepository.GetIdentityUserByIdAsync(Claims.UserId.ToString());
 
-                User.FirstName = UpdateModel.FirstName;
-                User.LastName = UpdateModel.LastName;
-                User.Notification = UpdateModel.Notification;
-                User.CountryId = UpdateModel.CountryId;
-                User.Lat = UpdateModel.Lat;
-                User.Lng = UpdateModel.Lng;
 
-                var UpdateUserResult = await _identityRepository.UpdateUserAsync(User);
+        //public async Task<Jwt_Claims> GetClaimsAsync(string username)
+        //{
+        //    // 1️⃣ Usuario base
+        //    User model = await _context.Users
+        //        .FirstOrDefaultAsync(x => x.Email == username);
 
-                if (!UpdateUserResult.Succeeded) return UpdateUserResult;
+        //    if (model == null)
+        //        return null!;
 
-                return IdentityResult.Success;
-            }
-            catch
-            {
-                return IdentityResult.Failed();
-            }
+        //    // 2️⃣ Datos de rol + estado
+        //    // Movimos la lógica de 'States' al WHERE para evitar el error de tipos en el JOIN
+        //    var datos = await (from u in _context.Users
+        //                       where u.Email == username
+        //                       join ur in _context.VwAspnetUsersInRoles on (object)u.UserId equals (object)ur.UserId
+        //                       join r in _context.VwAspnetRoles on ur.RoleId equals r.RoleId
+        //                       from s in _context.States
+        //                       where (u.IsActive ? 1 : 0) == s.StateId // Ajuste de comparación bool vs int
+        //                       select new
+        //                       {
+        //                           RoleName = r.RoleName,
+        //                           RoleId = r.RoleId,
+        //                           StatusName = s.Name
+        //                       }).FirstOrDefaultAsync();
 
-        }
+        //    // 3️⃣ Mapeo de Claims base
+        //    Jwt_Claims claim = _mapper.Map<Jwt_Claims>(model);
 
-        // Actualiza la imagen de un usuario
-        public async Task<IdentityResult> UpdateImage(IdentityUserProfile UserProfile, IFormFile Image)
-        {
-            try
-            {
+        //    if (datos != null)
+        //    {
+        //        claim.RoleName = datos.RoleName;
+        //        claim.RoleId = datos.RoleId;
+        //        claim.Status = datos.StatusName;
+        //    }
 
-                if (UserProfile.Photo != "") await _filesServices.DeleteImage(UserProfile.Photo);
+        //    // 4️⃣ Sucursales
+        //    var branchOffices = await (from us in _context.BranchsUsers
+        //                               where us.UserId == model.UserId
+        //                               join bo in _context.BranchsOffices on us.BranchOfficeId equals bo.BranchOfficeId
+        //                               select new Jwt_Claims_BracnhOffice
+        //                               {
+        //                                   BranchId = bo.BranchOfficeId ?? 0,
+        //                                   Description = bo.Name,
+        //                                   PointSale = bo.SalesPoint
+        //                               }).ToListAsync();
 
-                UserProfile.Photo = await _filesServices.UploadImage(Image, "Users");
+        //    claim.BranchOffices = branchOffices;
 
-                if (UserProfile.Photo == "") return IdentityResult.Failed();
-
-                var UpdateUserResult = await _identityRepository.UpdateUserAsync(UserProfile);
-
-                if (!UpdateUserResult.Succeeded) return UpdateUserResult;
-
-                return IdentityResult.Success;
-            }
-            catch
-            {
-                return IdentityResult.Failed();
-            }
-        }
-
-        // Elimina la cuenta de un usuario
-        public async Task<IdentityResult> DeleteAsync(IdentityUserProfile UserProfile)
-        {
-            UserProfile.Delete = true;
-            return await _identityRepository.UpdateUserAsync(UserProfile);
-        }
-
-        // Elimina un usuario
-        public async Task<IdentityResult> UserDeleteAsync(IdentityUserProfile UserProfile)
-        {
-            try
-            {
-                UserProfile.Delete = true;
-                UserProfile.LockoutEnabled = false;
-                UserProfile.LockoutEnd = DateTimeOffset.MaxValue;
-
-                var UpdateUserResult = await _identityRepository.UpdateUserAsync(UserProfile);
-
-                if (!UpdateUserResult.Succeeded) return UpdateUserResult;
-
-                return IdentityResult.Success;
-
-            }
-            catch
-            {
-                return IdentityResult.Failed();
-            }
-
-        }
-
-        // Genera el token de verificación de correo electrónico
-        public async Task<string> GenerateValidateTokenByEmail(string Email)
-        {
-            IdentityUserProfile user = await _identityRepository.GetIdentityUserByEmailAsync(Email);
-
-            if (user == null) return null;
-
-            var Token = await _identityRepository.GenerateEmailConfirmationTokenAsync(user);
-            var TokenUrl = Base64UrlEncoder.Encode(Token);
-
-            user.ConfirmEmailToken = Token;
-            await _identityRepository.UpdateUserAsync(user);
-            return TokenUrl;
-        }
-
-        // Genera el token de cambio de contraseña
-        public async Task<string> GenerateChangePasswordTokenByEmail(string Email)
-        {
-            IdentityUserProfile user = await _identityRepository.GetIdentityUserByEmailAsync(Email);
-
-            if (user == null) return null;
-
-            var Token = await _identityRepository.GeneratePasswordResetTokenAsync(user);
-            var TokenUrl = Base64UrlEncoder.Encode(Token);
-            user.ChangePasswordToken = Token;
-            await _identityRepository.UpdateUserAsync(user);
-            return TokenUrl;
-        }
-
-        // Valida el correo electronico con el token
-        public async Task<IdentityUserProfile> ValidateEmailByToken(string Token)
-        {
-            var TokenDecode = Base64UrlEncoder.Decode(Token);
-
-            var UserId = _identityRepository.GetAsync(x => x.ConfirmEmailToken == TokenDecode).Result.Id;
-
-            if (UserId == null) return null;
-
-            var user = await _identityRepository.GetIdentityUserByIdAsync(UserId);
-
-            if (user == null) return null;
-
-            var result = await _identityRepository.ConfirmEmailAsync(user, TokenDecode);
-
-            if (!result.Succeeded) return null;
-
-            user.EmailConfirmed = true;
-            user.ConfirmEmailToken = "";
-            await _identityRepository.UpdateUserAsync(user);
-            return user;
-        }
-
-        // Cambia la contraseña con el token
-        public async Task<IdentityUserProfile> ChangePasswordByToken(string Password, string Token)
-        {
-
-            var TokenDecode = Base64UrlEncoder.Decode(Token);
-
-            var UserId = _identityRepository.GetAsync(x => x.ChangePasswordToken == TokenDecode).Result.Id;
-
-            if (UserId == null) return null;
-
-            var user = await _identityRepository.GetIdentityUserByIdAsync(UserId);
-
-            if (user == null) return null;
-
-            await _identityRepository.ResetPasswordAsync(user, TokenDecode, Password);
-
-            user.ChangePasswordToken = "";
-            await _identityRepository.UpdateUserAsync(user);
-            return user;
-        }
-
-        // Cambia la contraseña utilizando la anterior
-        public async Task<IdentityResult> ChangePasswordAsync(IdentityUserProfile User, User_ChangePassword Model) => await _identityRepository.ChangePasswordAsync(User, Model);
-
+        //    return claim;
+        //}
     }
 }

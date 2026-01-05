@@ -21,7 +21,9 @@ Update-Database -context context
 Comandos:
 
 Mapeo de la Base de Datos: 
-Scaffold-DbContext "Server =147.93.176.131; Database = INFOGUIA; User = INFOGUIA; Password = INFOGUIA*963; TrustServerCertificate = true" Microsoft.EntityFrameworkCore.SqlServer -o Models -ContextDir Data -Context Context -NoOnConfiguring -f
+
+Scaffold-DbContext "Server = 147.93.176.131; Database = INFOGUIA; User = INFOGUIA; Password = INFOGUIA*963; TrustServerCertificate = true" Microsoft.EntityFrameworkCore.SqlServer -o Models -ContextDir Data -Context Context -NoOnConfiguring -f
+
 Server : Su ServerName de sql,
 Database : El nombre de la base de datos
 User Id y Password: las credenciales de inicio de sesion de su sql

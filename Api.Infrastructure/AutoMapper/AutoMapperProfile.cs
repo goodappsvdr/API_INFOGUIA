@@ -1,61 +1,27 @@
-﻿using Api.Shared.Identity;
-using Api.Shared.Jwt;
+﻿using Api.Shared.Models;
+using MimeKit;
 
 namespace Api.Infrastructure.AutoMapper
 {
-    public class AutoMapperProfile : Profile
-    {
-        public AutoMapperProfile()
-        {
+	public class AutoMapperProfile : Profile
+	{
+		public AutoMapperProfile()
+		{
 
-            #region Identity User 
+			#region Auth
 
-            CreateMap<IdentityUserProfile, User_Update>().ReverseMap();
+			//CreateMap<Usuario, Jwt_Claims>()
+			//   .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.IdUsuario))
+			//   .ForMember(dest => dest.BranchId, opt => opt.MapFrom(src => src.IdSucursal))
+			//   .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.Usuario1))
+			//   .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.Nombre))
+			//   .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+			//   .ForMember(dest => dest.Photo, opt => opt.MapFrom(src => src.Imagen))
+			//   .ReverseMap();
 
-            CreateMap<IdentityUserProfile, User_Create>().ReverseMap();
+			//    
+			#endregion
 
-            CreateMap<AspNetUser, Jwt_Claims>()
-                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.Id))
-                 .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.PhoneNumber))
-                 .AfterMap((src, dest) =>
-                 {
-                     dest.RoleName = src.Roles.Select(x => x.Name).FirstOrDefault();
-                 })
-                 .ReverseMap();
-            #endregion
-
-            #region Notifications
-            //CreateMap<Notification, Notifications_GetByUser>()
-            //    .ForMember(dest => dest.NotificationId, opt => opt.MapFrom(src => src.Id))
-            //    .ReverseMap();
-
-            //CreateMap<Notification, Notifications_SendModel>()
-            //    .ForMember(dest => dest.NotificationId, opt => opt.MapFrom(src => src.Id))
-            //    .ReverseMap();
-            #endregion
-
-            #region Politics
-            CreateMap<Politic, Politic_Create>().ReverseMap();
-
-            CreateMap<Politic, Politic_Update>().ReverseMap();
-
-            CreateMap<Politic, Politic_Get>().ReverseMap();
-            #endregion
-
-            #region Help
-            CreateMap<Help, Help_Create>().ReverseMap();
-
-            CreateMap<Help, Help_Update>()
-                .ForMember(dest => dest.HelpId, opt => opt.MapFrom(src => src.Id))
-                .ReverseMap();
-
-            CreateMap<Help, Help_Get>()
-                 .ForMember(dest => dest.HelpId, opt => opt.MapFrom(src => src.Id))
-                 .ReverseMap();
-            #endregion
-
-
-
-        }
-    }
+		}
+	}
 }

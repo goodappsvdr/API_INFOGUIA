@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using Api.Shared.Models;
 using Microsoft.EntityFrameworkCore;
+using DirectoryEntity = Api.Shared.Models.Directory;
+
 
 namespace Api.Shared.Data;
 
@@ -12,13 +14,17 @@ public partial class Context : DbContext
     {
     }
 
+    public virtual DbSet<BranchsOffice> BranchsOffices { get; set; }
+
+    public virtual DbSet<BranchsUser> BranchsUsers { get; set; }
+
     public virtual DbSet<Category> Categories { get; set; }
 
     public virtual DbSet<City> Cities { get; set; }
 
     public virtual DbSet<Country> Countries { get; set; }
 
-    public virtual DbSet<DirectoryInfoGuia> Directories { get; set; }
+    public virtual DbSet<Api.Shared.Models.Directory> Directories { get; set; }
 
     public virtual DbSet<Listing> Listings { get; set; }
 
@@ -46,6 +52,8 @@ public partial class Context : DbContext
 
     public virtual DbSet<Service> Services { get; set; }
 
+    public virtual DbSet<State> States { get; set; }
+
     public virtual DbSet<Tag> Tags { get; set; }
 
     public virtual DbSet<Tenant> Tenants { get; set; }
@@ -54,9 +62,39 @@ public partial class Context : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<BranchsOffice>(entity =>
+        {
+            entity.HasKey(e => e.BranchOfficeId);
+
+            entity.Property(e => e.BranchOfficeId).HasColumnName("BranchOfficeID");
+            entity.Property(e => e.Name)
+                .HasMaxLength(500)
+                .IsUnicode(false);
+            entity.Property(e => e.SalesPoint)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+        });
+
+        modelBuilder.Entity<BranchsUser>(entity =>
+        {
+            entity.HasKey(e => e.BranchUserId);
+
+            entity.Property(e => e.BranchUserId).HasColumnName("BranchUserID");
+            entity.Property(e => e.BranchOfficeId).HasColumnName("BranchOfficeID");
+            entity.Property(e => e.UserId).HasColumnName("UserID");
+        });
+
         modelBuilder.Entity<Category>(entity =>
         {
             entity.HasKey(e => e.CategoryId).HasName("PK__Categori__19093A2B99971774");
+
+            entity.HasIndex(e => e.CreatedByUserId, "IX_Categories_CreatedByUserID");
+
+            entity.HasIndex(e => e.ModifiedByUserId, "IX_Categories_ModifiedByUserID");
+
+            entity.HasIndex(e => e.ParentCategoryId, "IX_Categories_ParentCategoryID");
+
+            entity.HasIndex(e => e.TenantId, "IX_Categories_TenantID");
 
             entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
@@ -90,6 +128,8 @@ public partial class Context : DbContext
         {
             entity.HasKey(e => e.CityId).HasName("PK__Cities__F2D21A96FAB7A431");
 
+            entity.HasIndex(e => e.ProvinceId, "IX_Cities_ProvinceID");
+
             entity.Property(e => e.CityId).HasColumnName("CityID");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
             entity.Property(e => e.IconUrl).HasMaxLength(512);
@@ -116,7 +156,7 @@ public partial class Context : DbContext
             entity.Property(e => e.Name).HasMaxLength(100);
         });
 
-        modelBuilder.Entity<DirectoryInfoGuia>(entity =>
+        modelBuilder.Entity<DirectoryEntity>(entity =>
         {
             entity.HasKey(e => e.DirectoryId).HasName("PK__Director__3D93EF02310A129E");
 
@@ -144,17 +184,13 @@ public partial class Context : DbContext
             entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
             entity.Property(e => e.CityId).HasColumnName("CityID");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.CreatedByUserId)
-                .HasMaxLength(450)
-                .HasColumnName("CreatedByUserID");
+            entity.Property(e => e.CreatedByUserId).HasColumnName("CreatedByUserID");
             entity.Property(e => e.Email).HasMaxLength(255);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.Latitude).HasColumnType("decimal(9, 6)");
             entity.Property(e => e.LogoUrl).HasMaxLength(512);
             entity.Property(e => e.Longitude).HasColumnType("decimal(9, 6)");
-            entity.Property(e => e.ModifiedByUserId)
-                .HasMaxLength(450)
-                .HasColumnName("ModifiedByUserID");
+            entity.Property(e => e.ModifiedByUserId).HasColumnName("ModifiedByUserID");
             entity.Property(e => e.Name).HasMaxLength(255);
             entity.Property(e => e.ShortDescription).HasMaxLength(500);
             entity.Property(e => e.TenantId).HasColumnName("TenantID");
@@ -168,6 +204,8 @@ public partial class Context : DbContext
 
             entity.Property(e => e.ListingId).HasColumnName("ListingID");
             entity.Property(e => e.DirectoryId).HasColumnName("DirectoryID");
+            entity.Property(e => e.CreatedByUserId).HasColumnName("CreatedByUserID");
+            entity.Property(e => e.ModifiedByUserId).HasColumnName("ModifiedByUserID");
         });
 
         modelBuilder.Entity<ListingHour>(entity =>
@@ -181,6 +219,7 @@ public partial class Context : DbContext
             entity.Property(e => e.CreatedByUserId).HasColumnName("CreatedByUserID");
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.ListingId).HasColumnName("ListingID");
+            entity.Property(e => e.ModifiedByUserId).HasColumnName("ModifiedByUserID");
         });
 
         modelBuilder.Entity<ListingImage>(entity =>
@@ -196,6 +235,7 @@ public partial class Context : DbContext
             entity.Property(e => e.ImageUrl).HasMaxLength(512);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.ListingId).HasColumnName("ListingID");
+            entity.Property(e => e.ModifiedByUserId).HasColumnName("ModifiedByUserID");
         });
 
         modelBuilder.Entity<ListingPaymentMethod>(entity =>
@@ -204,6 +244,8 @@ public partial class Context : DbContext
 
             entity.Property(e => e.ListingId).HasColumnName("ListingID");
             entity.Property(e => e.PaymentMethodId).HasColumnName("PaymentMethodID");
+            entity.Property(e => e.CreatedByUserId).HasColumnName("CreatedByUserID");
+            entity.Property(e => e.ModifiedByUserId).HasColumnName("ModifiedByUserID");
         });
 
         modelBuilder.Entity<ListingPhone>(entity =>
@@ -217,6 +259,7 @@ public partial class Context : DbContext
             entity.Property(e => e.CreatedByUserId).HasColumnName("CreatedByUserID");
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.ListingId).HasColumnName("ListingID");
+            entity.Property(e => e.ModifiedByUserId).HasColumnName("ModifiedByUserID");
             entity.Property(e => e.PhoneNumber).HasMaxLength(50);
             entity.Property(e => e.PhoneType).HasMaxLength(50);
         });
@@ -227,6 +270,8 @@ public partial class Context : DbContext
 
             entity.Property(e => e.ListingId).HasColumnName("ListingID");
             entity.Property(e => e.ServiceId).HasColumnName("ServiceID");
+            entity.Property(e => e.CreatedByUserId).HasColumnName("CreatedByUserID");
+            entity.Property(e => e.ModifiedByUserId).HasColumnName("ModifiedByUserID");
         });
 
         modelBuilder.Entity<ListingSocialLink>(entity =>
@@ -240,6 +285,7 @@ public partial class Context : DbContext
             entity.Property(e => e.CreatedByUserId).HasColumnName("CreatedByUserID");
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.ListingId).HasColumnName("ListingID");
+            entity.Property(e => e.ModifiedByUserId).HasColumnName("ModifiedByUserID");
             entity.Property(e => e.NetworkName).HasMaxLength(50);
             entity.Property(e => e.ProfileUrl).HasMaxLength(512);
         });
@@ -250,6 +296,8 @@ public partial class Context : DbContext
 
             entity.Property(e => e.ListingId).HasColumnName("ListingID");
             entity.Property(e => e.TagId).HasColumnName("TagID");
+            entity.Property(e => e.CreatedByUserId).HasColumnName("CreatedByUserID");
+            entity.Property(e => e.ModifiedByUserId).HasColumnName("ModifiedByUserID");
         });
 
         modelBuilder.Entity<PaymentMethod>(entity =>
@@ -263,6 +311,7 @@ public partial class Context : DbContext
             entity.Property(e => e.CreatedByUserId).HasColumnName("CreatedByUserID");
             entity.Property(e => e.IconUrl).HasMaxLength(512);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.ModifiedByUserId).HasColumnName("ModifiedByUserID");
             entity.Property(e => e.Name).HasMaxLength(100);
             entity.Property(e => e.TenantId).HasColumnName("TenantID");
         });
@@ -270,6 +319,8 @@ public partial class Context : DbContext
         modelBuilder.Entity<Province>(entity =>
         {
             entity.HasKey(e => e.ProvinceId).HasName("PK__Province__FD0A6FA393A5CE47");
+
+            entity.HasIndex(e => e.CountryId, "IX_Provinces_CountryID");
 
             entity.Property(e => e.ProvinceId).HasColumnName("ProvinceID");
             entity.Property(e => e.CountryId).HasColumnName("CountryID");
@@ -307,8 +358,19 @@ public partial class Context : DbContext
             entity.Property(e => e.CreatedByUserId).HasColumnName("CreatedByUserID");
             entity.Property(e => e.IconUrl).HasMaxLength(512);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
+            entity.Property(e => e.ModifiedByUserId).HasColumnName("ModifiedByUserID");
             entity.Property(e => e.Name).HasMaxLength(100);
             entity.Property(e => e.TenantId).HasColumnName("TenantID");
+        });
+
+        modelBuilder.Entity<State>(entity =>
+        {
+            entity.Property(e => e.StateId).HasColumnName("StateID");
+            entity.Property(e => e.CategoryId).HasColumnName("CategoryID");
+            entity.Property(e => e.Name)
+                .HasMaxLength(500)
+                .IsUnicode(false);
+            entity.Property(e => e.State1).HasColumnName("State");
         });
 
         modelBuilder.Entity<Tag>(entity =>
@@ -327,6 +389,12 @@ public partial class Context : DbContext
         modelBuilder.Entity<Tenant>(entity =>
         {
             entity.HasKey(e => e.TenantId).HasName("PK__Tenants__2E9B47813336E98C");
+
+            entity.HasIndex(e => e.CityId, "IX_Tenants_CityID");
+
+            entity.HasIndex(e => e.CreatedByUserId, "IX_Tenants_CreatedByUserID");
+
+            entity.HasIndex(e => e.ModifiedByUserId, "IX_Tenants_ModifiedByUserID");
 
             entity.Property(e => e.TenantId).HasColumnName("TenantID");
             entity.Property(e => e.CityId).HasColumnName("CityID");
@@ -353,6 +421,12 @@ public partial class Context : DbContext
         modelBuilder.Entity<User>(entity =>
         {
             entity.HasKey(e => e.UserId).HasName("PK__Users__1788CCAC2B1B6163");
+
+            entity.HasIndex(e => e.CreatedByUserId, "IX_Users_CreatedByUserID");
+
+            entity.HasIndex(e => e.ModifiedByUserId, "IX_Users_ModifiedByUserID");
+
+            entity.HasIndex(e => e.RoleId, "IX_Users_RoleID");
 
             entity.HasIndex(e => e.TenantId, "IX_Users_TenantID").HasFilter("([TenantID] IS NOT NULL)");
 

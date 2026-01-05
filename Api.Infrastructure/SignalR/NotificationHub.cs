@@ -13,11 +13,11 @@
         }
 
         // Envia una notificacion al usuario que esta conectado
-        public async Task SendNotification(Notifications_SendModel Model, string UserId)
-        {
-            var groupName = $"user-{UserId}";
-            await Clients.Group(groupName).SendAsync("SendNotificationSuccess", Model);
-        }
+        //public async Task SendNotification(Notifications_SendModel Model, string UserId)
+        //{
+        //    var groupName = $"user-{UserId}";
+        //    await Clients.Group(groupName).SendAsync("SendNotificationSuccess", Model);
+        //}
 
         //Cuando se conecta un usuario
         public override async Task OnConnectedAsync()

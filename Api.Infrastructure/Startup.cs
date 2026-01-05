@@ -1,9 +1,8 @@
-﻿using Api.Infrastructure.Services.Cities;
-using Api.Infrastructure.Services.Listings;
-using Api.Infrastructure.Services.Province;
-using Api.Shared.Identity;
-using Api.Shared.Interface;
+﻿//using Api.Infrastructure.Services.AccountBank;
+using Api.Shared.Data;
+using Api.Shared.ServiciosExternos;
 using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 namespace Api.Infrastructure;
 public static class Startup
@@ -14,27 +13,25 @@ public static class Startup
         services.AddControllers();
         services.AddHttpContextAccessor();
         services.AddSqlConnection(config);
-        services.AddIdentitySettings();
-       // services.AddJwtTokenServices(config);
-        services.AddAuth0Authentication(config);
+        services.AddJwtTokenServices(config);
         services.AddCorsSettings();
         services.AddSignalRSettings();
         services.AddAutoMapperSettings();
-        services.AddMailing(config);
         services.AddServicesSettings();
         services.AddSwagger(config);
         return services;
     }
     public static IApplicationBuilder UseInfrastructure(this IApplicationBuilder app, IConfiguration config)
     {
+    
         app.UseStaticFiles();
         app.UseRouting();
         app.UseHttpsRedirection();
         app.UseCors("CorsPolicy");
-        app.UseAuthentication();
         app.UseAuthorization();
         app.UseSignalR();
         app.UseSwaggerGen();
+
         return app;
     }
     internal static IApplicationBuilder UseSignalR(this IApplicationBuilder app)
@@ -63,44 +60,60 @@ public static class Startup
     internal static IServiceCollection AddSqlConnection(this IServiceCollection services, IConfiguration config)
     {
         var connectionString = config.GetConnectionString("SQL");
-        services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
-        services.AddDbContext<Context>(options => options.UseSqlServer(connectionString));
+        services.AddDbContext<ContextInfoGuia>(options => options.UseSqlServer(connectionString));
         return services;
     }
     internal static IServiceCollection AddCorsSettings(this IServiceCollection services)
     {
         services.AddCors(options =>
         {
-            options.AddPolicy("CorsPolicy",
-               policy =>
-               {
-                   policy.WithOrigins("http://localhost:5173")
-                         .AllowAnyHeader()
-                         .AllowAnyMethod()
-                         .AllowCredentials()
-                         .SetIsOriginAllowed(origin => true);
-               });
-        });
+			
+
+			options.AddPolicy("CorsPolicy",
+				policy =>
+				{
+					policy.AllowAnyOrigin()
+						  .AllowAnyHeader()
+						  .AllowAnyMethod();
+				});
+		});
         return services;
     }
     internal static IServiceCollection AddServicesSettings(this IServiceCollection services)
     {
-        services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
-        services.AddTransient(typeof(IIdentityRepository<>), typeof(IdentityRepository<>));
-
+        
         services.AddTransient<IUsersServices, UsersServices>();
-        services.AddTransient<IAuthServices, AuthServices>();
-        services.AddTransient<IFilesServices, FilesServices>();
-        services.AddTransient<IEmailServices, EmailServices>();
-        services.AddTransient<INotificationsServices, NotificationsServices>();
-        services.AddTransient<IPoliticsServices, PoliticsServices>();
-        services.AddTransient<IHelpServices, HelpServices>();
-        services.AddScoped<ITenantService, TenantService>();
-        services.AddScoped<ICurrentUserService, CurrentUserService>();
-        services.AddScoped<ICitiesServices, CitiesServices>();
-        services.AddScoped<IListingsServices, ListingsServices>();
+        //services.AddTransient<IStatusServices, StatusServices>();
+        //services.AddTransient<IProvinceServices, ProvinceServices>();
+        //services.AddTransient<ILocalityService, LocalityService>();
+        //services.AddTransient<ICategoryServices, CategoryServices>();
+        //services.AddTransient<IParameterServices, ParameterServices>();
+        //services.AddTransient<IBankServices, BankServices>();
+        //services.AddTransient<IBranchBankServices,BranchBankServices>();
+        //services.AddTransient<IClientDocumentServices, ClientDocumentServices>();
+        //services.AddTransient<ICurrentAccountServices, CurrentAccountServices>();
+        //services.AddTransient<IPaymentElementServices, PaymentElementServices>();
+        //services.AddTransient<IAccountBankServices, AccountBankServices>();
+        //services.AddTransient<ITaxServices, TaxServices>();
+        //services.AddTransient<IPriceListServices, PriceListServices>();
+        //services.AddTransient<IItemsServices, ItemsServices>();
+        //services.AddTransient<IRubroServices, RubroServices>();
+        //services.AddTransient<ISubRubroServices, SubRubroServices>();
+        //services.AddTransient<IBrandServices, BrandServices>();
+        //services.AddTransient<IModelServices, ModelServices>();
+        //services.AddTransient<IProviderDocumentServices, ProviderDocumentServices>();
+        //services.AddTransient<IPayOrderServices,PayOrderServices>();
+        //services.AddTransient<ICardsServicios, CardsServicios>();
+        //services.AddTransient<IStaticConfigs, StaticConfigs>();
+        //services.AddTransient<IProductSystelService, ProductSystelService>();
+        //services.AddTransient<IReceiptServices, ReceiptServices>();
+        //services.AddTransient<IPricelistVersionService, PricelistVersionService>();
+        //services.AddTransient<IInvoiceServices, InvoiceServices>();
+        //services.AddTransient<IDepartamentService, DepartamentServices>();
+        //services.AddTransient<IFileServices , FileServices>();
+        //services.AddTransient<IEntityServices , EntityServices>();
 
-        return services;
+		return services;
     }
     internal static IServiceCollection AddSignalRSettings(this IServiceCollection services)
     {
@@ -111,27 +124,6 @@ public static class Startup
         });
         return services;
     }
-    internal static IServiceCollection AddIdentitySettings(this IServiceCollection services)
-    {
-        services.AddIdentity<IdentityUserProfile, IdentityRole>()
-            .AddEntityFrameworkStores<ApplicationDbContext>()
-            .AddDefaultTokenProviders();
 
-        services.Configure<IdentityOptions>(options =>
-        {
-            options.Password.RequireDigit = false;
-            options.Password.RequireLowercase = false;
-            options.Password.RequireNonAlphanumeric = false;
-            options.Password.RequireUppercase = false;
-            options.Password.RequiredLength = 2;
-            options.Password.RequiredUniqueChars = 0;
-            //options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-            //options.Lockout.MaxFailedAccessAttempts = 5;
-            //options.Lockout.AllowedForNewUsers = true;
-        });
-
-        return services;
-    }
-    internal static IServiceCollection AddMailing(this IServiceCollection services, IConfiguration config) => services.Configure<MailSettings>(config.GetSection(nameof(MailSettings)));
-    internal static IServiceCollection AddAutoMapperSettings(this IServiceCollection services) => services.AddAutoMapper(cfg => cfg.AddProfile<AutoMapperProfile>());
+    internal static IServiceCollection AddAutoMapperSettings(this IServiceCollection services) => services.AddAutoMapper(typeof(AutoMapperProfile));
 }
