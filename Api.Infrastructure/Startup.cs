@@ -1,4 +1,5 @@
 ﻿//using Api.Infrastructure.Services.AccountBank;
+using Api.Infrastructure.Services.Listings;
 using Api.Shared.Data;
 using Api.Shared.ServiciosExternos;
 using Microsoft.AspNetCore.Http.Connections;
@@ -83,6 +84,7 @@ public static class Startup
     {
         
         services.AddTransient<IUsersServices, UsersServices>();
+        services.AddTransient<IListingsServices, ListingsServices>();
         //services.AddTransient<IStatusServices, StatusServices>();
         //services.AddTransient<IProvinceServices, ProvinceServices>();
         //services.AddTransient<ILocalityService, LocalityService>();
@@ -113,7 +115,7 @@ public static class Startup
         //services.AddTransient<IFileServices , FileServices>();
         //services.AddTransient<IEntityServices , EntityServices>();
 
-		return services;
+        return services;
     }
     internal static IServiceCollection AddSignalRSettings(this IServiceCollection services)
     {
