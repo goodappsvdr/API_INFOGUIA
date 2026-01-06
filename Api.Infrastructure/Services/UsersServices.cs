@@ -3,6 +3,9 @@ using Api.Shared.Models;
 
 
 using Api.Shared.DTOs.Auth;
+using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace Api.Infrastructure.Services
 {
@@ -32,28 +35,6 @@ namespace Api.Infrastructure.Services
             return user.PasswordHash == login.Password;
         }
 
-
-
-        //public async Task<bool> LoginAsync(Auth_Login login)
-        //{
-        //	var usuario = await _context.Users
-        //		.Where(x => x.Email == login.Username)
-        //		.FirstOrDefaultAsync();
-
-        //	// Verifica si el usuario fue encontrado
-        //	if (usuario != null)
-        //	{
-        //		// Verifica las credenciales
-        //		if (usuario.Email == login.Username && usuario.PasswordHash == login.Password)
-        //		{
-        //			return true; // Credenciales correctas
-        //		}
-        //	}
-
-        //	return false; // Usuario no encontrado o credenciales incorrectas
-        //}
-
-
         public async Task<Jwt_Claims> GetClaimsAsync(string username)
         {
             var data = await (
@@ -74,7 +55,7 @@ namespace Api.Infrastructure.Services
 
             Jwt_Claims claim = new Jwt_Claims
             {
-                UserId = data.User.UserId,
+                UserId = data.User.UserId ?? 0,
                 Email = data.User.Email,
                 FirstName = data.User.FirstName,
                 LastName = data.User.LastName,
@@ -100,56 +81,5 @@ namespace Api.Infrastructure.Services
             return claim;
         }
 
-
-
-        //public async Task<Jwt_Claims> GetClaimsAsync(string username)
-        //{
-        //    // 1️⃣ Usuario base
-        //    User model = await _context.Users
-        //        .FirstOrDefaultAsync(x => x.Email == username);
-
-        //    if (model == null)
-        //        return null!;
-
-        //    // 2️⃣ Datos de rol + estado
-        //    // Movimos la lógica de 'States' al WHERE para evitar el error de tipos en el JOIN
-        //    var datos = await (from u in _context.Users
-        //                       where u.Email == username
-        //                       join ur in _context.VwAspnetUsersInRoles on (object)u.UserId equals (object)ur.UserId
-        //                       join r in _context.VwAspnetRoles on ur.RoleId equals r.RoleId
-        //                       from s in _context.States
-        //                       where (u.IsActive ? 1 : 0) == s.StateId // Ajuste de comparación bool vs int
-        //                       select new
-        //                       {
-        //                           RoleName = r.RoleName,
-        //                           RoleId = r.RoleId,
-        //                           StatusName = s.Name
-        //                       }).FirstOrDefaultAsync();
-
-        //    // 3️⃣ Mapeo de Claims base
-        //    Jwt_Claims claim = _mapper.Map<Jwt_Claims>(model);
-
-        //    if (datos != null)
-        //    {
-        //        claim.RoleName = datos.RoleName;
-        //        claim.RoleId = datos.RoleId;
-        //        claim.Status = datos.StatusName;
-        //    }
-
-        //    // 4️⃣ Sucursales
-        //    var branchOffices = await (from us in _context.BranchsUsers
-        //                               where us.UserId == model.UserId
-        //                               join bo in _context.BranchsOffices on us.BranchOfficeId equals bo.BranchOfficeId
-        //                               select new Jwt_Claims_BracnhOffice
-        //                               {
-        //                                   BranchId = bo.BranchOfficeId ?? 0,
-        //                                   Description = bo.Name,
-        //                                   PointSale = bo.SalesPoint
-        //                               }).ToListAsync();
-
-        //    claim.BranchOffices = branchOffices;
-
-        //    return claim;
-        //}
     }
 }
