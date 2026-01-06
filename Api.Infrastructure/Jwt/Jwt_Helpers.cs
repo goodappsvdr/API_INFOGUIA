@@ -120,5 +120,12 @@ namespace Api.Infrastructure.Jwt
             JwtSecurityToken jwtToken = tokenHandler.ReadJwtToken(Token);
             return jwtToken.Claims.FirstOrDefault(c => c.Type == "http://schemas.microsoft.com/ws/2008/06/identity/claims/expiration")?.Value;
         }
+        public static string GetIdUserByToken(string Token)
+        {
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+            JwtSecurityToken jwtToken = tokenHandler.ReadJwtToken(Token);
+            return jwtToken.Claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+        }
+
     }
 }
