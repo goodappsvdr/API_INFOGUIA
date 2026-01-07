@@ -1,117 +1,173 @@
-﻿using Api.Infrastructure.Jwt;
-using Api.Infrastructure.Services.Listings;
+﻿using Api.Infrastructure.Services.Listings;
 using Api.Shared.DTOs.Listings;
-using Microsoft.AspNetCore.Http;
+using Api.Shared.Models;
+using API.Extensions;
+using API.Filters;
 using Microsoft.AspNetCore.Mvc;
+using Api.Infrastructure.Exceptions;
+using Api.Shared.DTOs;
 
 namespace API.Controllers
 {
+    /// <summary>
+    /// Controlador de Listings
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [JwtAuthorization] // Aplica la autorización a todos los endpoints
     public class ListingsController : ControllerBase
     {
         private readonly IListingsServices _listingsServices;
-        public ListingsController(IListingsServices listingsServices)
+        private readonly ILogger<ListingsController> _logger;
+
+        public ListingsController(
+            IListingsServices listingsServices,
+            ILogger<ListingsController> logger)
         {
             _listingsServices = listingsServices;
+            _logger = logger;
         }
-  
+
         /// <summary>
-        /// Method to create a new listing
+        /// Creates a new listing
         /// </summary>
-        /// <param name="listingDto"></param>
-        /// <returns></returns>
+        /// <param name="listingDto">Listing data</param>
+        /// <returns>Created listing</returns>
+        /// <response code="201">Listing created successfully</response>
+        /// <response code="400">Invalid data</response>
+        /// <response code="401">Unauthorized</response>
         [HttpPost]
+        [ProducesResponseType(typeof(ApiResponse<ListingDTO>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateListing([FromBody] AddListingDTO listingDto)
         {
-            var IdUser = Jwt_Helpers.GetIdUserByToken(Request.Headers["Authorization"].ToString().Replace("Bearer ", ""));
-
-            //Verifico que el usuario esté autenticado
-
-            if (string.IsNullOrEmpty(IdUser))
+            try
             {
-                return Unauthorized("User is not authenticated.");
+                var userId = HttpContext.GetUserId();
+                var createdListing = await _listingsServices.CreateListingAsync(userId, listingDto);
+
+                return CreatedAtAction(
+                    nameof(GetListingById),
+                    new { id = createdListing.Id },
+                    ApiResponse<ListingDTO>.SuccessResponse(createdListing, "Listing created successfully")
+                );
             }
-            var createdListing = await _listingsServices.CreateListingAsync(IdUser, listingDto);
-            return CreatedAtAction(nameof(CreateListing), new { id = createdListing.Id }, createdListing);
+            catch (BadRequestException ex)
+            {
+                _logger.LogWarning(ex, "Bad request while creating listing");
+                return BadRequest(ApiResponse<object>.ErrorResponse(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating listing");
+                return StatusCode(500, ApiResponse<object>.ErrorResponse("An error occurred while creating the listing"));
+            }
         }
 
-
-       /// <summary>
-        /// Method to get all listings
+        /// <summary>
+        /// Gets all listings
         /// </summary>
-        /// <returns></returns>
+        /// <returns>List of all listings</returns>
+        /// <response code="200">Returns the list of listings</response>
+        /// <response code="401">Unauthorized</response>
         [HttpGet]
+        [ProducesResponseType(typeof(ApiResponse<List<ListingDTO>>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllListings()
         {
-            var IdUser = Jwt_Helpers.GetIdUserByToken(Request.Headers["Authorization"].ToString().Replace("Bearer ", ""));
-
-            //Verifico que el usuario esté autenticado
- 
-            if (string.IsNullOrEmpty(IdUser))
+            try
             {
-                return Unauthorized("User is not authenticated.");
+                var listings = await _listingsServices.GetAllListingsAsync();
+                return Ok(ApiResponse<List<ListingDTO>>.SuccessResponse(
+                    listings,
+                    $"{listings.Count} listing(s) found"
+                ));
             }
-
-            var listings = await _listingsServices.GetAllListingsAsync();
-            if (listings == null || listings.Count == 0)
+            catch (Exception ex)
             {
-                return NotFound("No listings found.");
+                _logger.LogError(ex, "Error retrieving listings");
+                return StatusCode(500, ApiResponse<object>.ErrorResponse("An error occurred while retrieving listings"));
             }
-            return Ok(listings);
         }
 
-
         /// <summary>
-        /// Method to get listing by id
+        /// Gets a specific listing by ID
         /// </summary>
-        
+        /// <param name="id">Listing ID</param>
+        /// <returns>Listing details</returns>
+        /// <response code="200">Returns the listing</response>
+        /// <response code="404">Listing not found</response>
+        /// <response code="401">Unauthorized</response>
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(ApiResponse<ListingDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetListingById(int id)
         {
-            var IdUser = Jwt_Helpers.GetIdUserByToken(Request.Headers["Authorization"].ToString().Replace("Bearer ", ""));
-
-            //Verifico que el usuario esté autenticado
-
-            if (string.IsNullOrEmpty(IdUser))
+            try
             {
-                return Unauthorized("User is not authenticated.");
+                var listing = await _listingsServices.GetListingByIdAsync(id);
+                return Ok(ApiResponse<ListingDTO>.SuccessResponse(listing));
             }
-            var listing = await _listingsServices.GetListingByIdAsync(id);
-            if (listing == null)
+            catch (NotFoundException ex)
             {
-                return NotFound();
+                _logger.LogWarning(ex, "Listing not found: {ListingId}", id);
+                return NotFound(ApiResponse<object>.ErrorResponse(ex.Message));
             }
-            return Ok(listing);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving listing {ListingId}", id);
+                return StatusCode(500, ApiResponse<object>.ErrorResponse("An error occurred while retrieving the listing"));
+            }
         }
 
         /// <summary>
-        /// Method to update a listing
+        /// Updates an existing listing
         /// </summary>
-
-        [HttpPut]
-        public async Task<IActionResult> UpdateListing( [FromBody] ListingDTO listingDto)
+        /// <param name="id">Listing ID</param>
+        /// <param name="listingDto">Updated listing data</param>
+        /// <returns>Updated listing</returns>
+        /// <response code="200">Listing updated successfully</response>
+        /// <response code="400">Invalid data or ID mismatch</response>
+        /// <response code="403">User doesn't own this listing</response>
+        /// <response code="404">Listing not found</response>
+        [HttpPut("{id}")]
+        [ProducesResponseType(typeof(ApiResponse<ListingDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateListing(int id, [FromBody] ListingDTO listingDto)
         {
-            var IdUser = Jwt_Helpers.GetIdUserByToken(Request.Headers["Authorization"].ToString().Replace("Bearer ", ""));
+            try
+            {
+                if (id != listingDto.Id)
+                {
+                    return BadRequest(ApiResponse<object>.ErrorResponse("ID in URL doesn't match ID in body"));
+                }
 
-            //Verifico que el usuario esté autenticado
+                var userId = HttpContext.GetUserId();
+                var updatedListing = await _listingsServices.UpdateListingAsync(userId, listingDto);
 
-            if (string.IsNullOrEmpty(IdUser))
-            {
-                return Unauthorized("User is not authenticated.");
+                return Ok(ApiResponse<ListingDTO>.SuccessResponse(updatedListing, "Listing updated successfully"));
             }
-            // Verifico que el ID del listing en la URL coincida con el ID en el DTO
-            var id = _listingsServices.GetListingByIdAsync(listingDto.Id);
-            if (id == null)
+            catch (NotFoundException ex)
             {
-                return BadRequest("Listing ID mismatch.");
+                _logger.LogWarning(ex, "Listing not found: {ListingId}", id);
+                return NotFound(ApiResponse<object>.ErrorResponse(ex.Message));
             }
-            var updatedListing = await _listingsServices.UpdateListingAsync(IdUser, listingDto);
-            if (updatedListing == null)
+            catch (UnauthorizedException ex)
             {
-                return NotFound();
+                _logger.LogWarning(ex, "User doesn't own listing: {ListingId}", id);
+                return StatusCode(403, ApiResponse<object>.ErrorResponse(ex.Message));
             }
-            return Ok(updatedListing);
+            catch (BadRequestException ex)
+            {
+                _logger.LogWarning(ex, "Bad request while updating listing: {ListingId}", id);
+                return BadRequest(ApiResponse<object>.ErrorResponse(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating listing {ListingId}", id);
+                return StatusCode(500, ApiResponse<object>.ErrorResponse("An error occurred while updating the listing"));
+            }
         }
 
     }

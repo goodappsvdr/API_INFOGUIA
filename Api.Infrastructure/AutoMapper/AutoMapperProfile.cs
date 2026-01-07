@@ -24,13 +24,35 @@ namespace Api.Infrastructure.AutoMapper
             #endregion
 
 
-            // Listings
+            // ========== LISTINGS ==========
+
+            // Listing -> ListingDTO
             CreateMap<Listing, ListingDTO>()
-                .ReverseMap();
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.ListingId))
+                .ForMember(d => d.LogoUrl, o => o.MapFrom(s => s.LogoUrl ?? string.Empty))
+                .ForMember(d => d.Address, o => o.MapFrom(s => s.Address ?? string.Empty));
+
+            // AddListingDTO -> Listing
             CreateMap<AddListingDTO, Listing>()
-                .ReverseMap();
+                .ForMember(d => d.ListingId, o => o.Ignore())
+                .ForMember(d => d.IsActive, o => o.MapFrom(s => true))
+                .ForMember(d => d.CreatedAt, o => o.Ignore())
+                .ForMember(d => d.CreatedByUserId, o => o.Ignore())
+                .ForMember(d => d.ModifiedAt, o => o.Ignore())
+                .ForMember(d => d.ModifiedByUserId, o => o.Ignore());
+
+            // UpdateListingDTO -> Listing
             CreateMap<UpdateListingDTO, Listing>()
-                .ReverseMap();
+                .ForMember(d => d.ListingId, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.TenantId, o => o.Ignore())
+                .ForMember(d => d.CreatedAt, o => o.Ignore())
+                .ForMember(d => d.CreatedByUserId, o => o.Ignore())
+                .ForMember(d => d.ModifiedAt, o => o.Ignore())
+                .ForMember(d => d.ModifiedByUserId, o => o.Ignore());
+
+            // Listing -> UpdateListingDTO
+            CreateMap<Listing, UpdateListingDTO>()
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.ListingId));
 
         }
     }

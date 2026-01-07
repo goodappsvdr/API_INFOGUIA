@@ -1,4 +1,5 @@
-﻿//using Api.Infrastructure.Services.AccountBank;
+﻿
+using Api.Infrastructure.Services.Categories;
 using Api.Infrastructure.Services.Listings;
 using Api.Shared.Data;
 using Api.Shared.ServiciosExternos;
@@ -31,7 +32,7 @@ public static class Startup
         app.UseCors("CorsPolicy");
         app.UseAuthorization();
         app.UseSignalR();
-        app.UseSwaggerGen();
+        app.UseSwaggerGen(config);
 
         return app;
     }
@@ -85,35 +86,8 @@ public static class Startup
         
         services.AddTransient<IUsersServices, UsersServices>();
         services.AddTransient<IListingsServices, ListingsServices>();
-        //services.AddTransient<IStatusServices, StatusServices>();
-        //services.AddTransient<IProvinceServices, ProvinceServices>();
-        //services.AddTransient<ILocalityService, LocalityService>();
-        //services.AddTransient<ICategoryServices, CategoryServices>();
-        //services.AddTransient<IParameterServices, ParameterServices>();
-        //services.AddTransient<IBankServices, BankServices>();
-        //services.AddTransient<IBranchBankServices,BranchBankServices>();
-        //services.AddTransient<IClientDocumentServices, ClientDocumentServices>();
-        //services.AddTransient<ICurrentAccountServices, CurrentAccountServices>();
-        //services.AddTransient<IPaymentElementServices, PaymentElementServices>();
-        //services.AddTransient<IAccountBankServices, AccountBankServices>();
-        //services.AddTransient<ITaxServices, TaxServices>();
-        //services.AddTransient<IPriceListServices, PriceListServices>();
-        //services.AddTransient<IItemsServices, ItemsServices>();
-        //services.AddTransient<IRubroServices, RubroServices>();
-        //services.AddTransient<ISubRubroServices, SubRubroServices>();
-        //services.AddTransient<IBrandServices, BrandServices>();
-        //services.AddTransient<IModelServices, ModelServices>();
-        //services.AddTransient<IProviderDocumentServices, ProviderDocumentServices>();
-        //services.AddTransient<IPayOrderServices,PayOrderServices>();
-        //services.AddTransient<ICardsServicios, CardsServicios>();
-        //services.AddTransient<IStaticConfigs, StaticConfigs>();
-        //services.AddTransient<IProductSystelService, ProductSystelService>();
-        //services.AddTransient<IReceiptServices, ReceiptServices>();
-        //services.AddTransient<IPricelistVersionService, PricelistVersionService>();
-        //services.AddTransient<IInvoiceServices, InvoiceServices>();
-        //services.AddTransient<IDepartamentService, DepartamentServices>();
-        //services.AddTransient<IFileServices , FileServices>();
-        //services.AddTransient<IEntityServices , EntityServices>();
+        services.AddTransient<ICategorieServices, CategorieServices>();
+
 
         return services;
     }
