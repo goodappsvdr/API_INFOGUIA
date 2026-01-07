@@ -1,7 +1,12 @@
 ﻿using Api.Infrastructure.Jwt;
 using Api.Infrastructure.Services.Interface;
+using Api.Shared.Data;
 using Api.Shared.DTOs.Auth;
+using Api.Shared.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System.Text.RegularExpressions;
+using Google.Apis.Auth;
 
 namespace Api.Controllers
 {
@@ -11,6 +16,7 @@ namespace Api.Controllers
     [ApiController, AllowAnonymous, Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
+        private readonly ContextInfoGuia _context;
         private readonly IUsersServices _usersServices;
         private readonly Jwt_AccessTokenSettings _accessTokenSettings;
         private readonly Jwt_RefreshTokenSettings _refreshTokenSettings;
@@ -21,12 +27,18 @@ namespace Api.Controllers
         /// <param name="usersServices">La interfaz para operaciones de Usuario</param>
         /// <param name="accessTokenSettings">Clase de configuracion del access token</param>
         /// <param name="refreshTokenSettings">Clase de configuracion del refresh token</param>
-        public UsersController(IUsersServices usersServices, Jwt_AccessTokenSettings accessTokenSettings, Jwt_RefreshTokenSettings refreshTokenSettings)
+        public UsersController(
+        IUsersServices usersServices,
+        Jwt_AccessTokenSettings accessTokenSettings,
+        Jwt_RefreshTokenSettings refreshTokenSettings,
+        ContextInfoGuia context)
         {
             _usersServices = usersServices;
             _accessTokenSettings = accessTokenSettings;
             _refreshTokenSettings = refreshTokenSettings;
+            _context = context;
         }
+
 
         /// <summary>
         /// Obtiene las claims del usuarios atravez del token.
@@ -124,5 +136,134 @@ namespace Api.Controllers
                 return StatusCode(StatusCodes.Status500InternalServerError, ex);
             }
         }
+
+        /// <summary>
+        /// Crear un nuevo Usuario
+        /// </summary>
+        /// 
+        [HttpPost("CreateUser")]
+        public async Task<ActionResult> CreateUserAsync(createUser_Input input)
+        {
+            try
+            {
+                var usermodel = new User
+                {
+                    TenantId = 1,
+                    RoleId = 1,
+                    Email = input.email ?? string.Empty,
+                    PasswordHash = input.password ?? string.Empty,
+                    FirstName = "",
+                    LastName = "",
+                    ImgProfile = "",
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedByUserId = null,
+                    ModifiedAt = DateTime.UtcNow,
+                    ModifiedByUserId = null
+                };
+
+                // 1️⃣ Insert → genera UserId
+                _context.Users.Add(usermodel);
+                await _context.SaveChangesAsync();
+
+                // 2️⃣ Usar el ID autogenerado
+                usermodel.CreatedByUserId = usermodel.UserId;
+                usermodel.ModifiedByUserId = usermodel.UserId;
+
+                _context.Users.Update(usermodel);
+                await _context.SaveChangesAsync();
+
+                return Ok(usermodel.UserId);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    Error = "Error creando usuario",
+                    Detalle = ex.Message,
+                    Inner = ex.InnerException?.Message
+                });
+            }
+        }
+
+        /// <summary>
+        /// Crear un nuevo Usuario desde la cuenta de Gmail
+        /// </summary>
+        /// 
+        [HttpPost("LoginWithGoogle")]
+        public async Task<ActionResult> LoginWithGoogle([FromBody] GoogleLoginInput input)
+        {
+            try
+            {
+                var settings = new GoogleJsonWebSignature.ValidationSettings
+                {
+                    Audience = new[]
+                    {
+                "198608702380-0p9in3tfc6n2qsucfs4guj3ccu318qv4.apps.googleusercontent.com"
+            }
+                };
+
+                var payload = await GoogleJsonWebSignature.ValidateAsync(
+                    input.IdToken,
+                    settings
+                );
+
+                string email = payload.Email;
+
+                var user = await _context.Users
+                    .FirstOrDefaultAsync(x => x.Email == email);
+
+                if (user == null)
+                {
+                    user = new User
+                    {
+                        TenantId = 1,
+                        RoleId = 1,
+                        Email = email,
+                        PasswordHash = "", // 🔐 NO GOOGLE
+                        FirstName = payload.GivenName ?? "",
+                        LastName = payload.FamilyName ?? "",
+                        ImgProfile = payload.Picture,
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow,
+                        CreatedByUserId = 0,
+                        ModifiedAt = DateTime.UtcNow,
+                        ModifiedByUserId = 0
+                    };
+
+                    _context.Users.Add(user);
+                    await _context.SaveChangesAsync();
+
+                    user.CreatedByUserId = user.UserId;
+                    user.ModifiedByUserId = user.UserId;
+                    await _context.SaveChangesAsync();
+                }
+
+                if (!user.IsActive)
+                    return Unauthorized("Usuario inactivo");
+
+                var claims = await _usersServices.GetClaimsAsync(user.Email);
+
+                var tokens = Jwt_Helpers.GetAccessTokens(
+                    new Jwt_Tokens(),
+                    claims,
+                    _accessTokenSettings
+                );
+
+                return Ok(tokens);
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized(new
+                {
+                    Error = "Token Google inválido",
+                    Detalle = ex.Message
+                });
+            }
+        }
+
+
+
+
     }
 }
