@@ -10,12 +10,12 @@ namespace Api.Infrastructure.Services.ListingHoursServices
 {
     public class ListingHoursServices : IListingHoursServices
     {
-        private readonly ContextInfoGuia _context;
+        private readonly Context _context;
         private readonly IMapper _mapper;
         private readonly ILogger<ListingHoursServices> _logger;
 
         public ListingHoursServices(
-            ContextInfoGuia context,
+            Context context,
             IMapper mapper,
             ILogger<ListingHoursServices> logger)
         {

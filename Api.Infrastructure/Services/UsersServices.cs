@@ -11,10 +11,10 @@ namespace Api.Infrastructure.Services
 {
 	public class UsersServices : IUsersServices
 	{
-		private readonly ContextInfoGuia _context;
+		private readonly Context _context;
 		private readonly IMapper _mapper;
 
-		public UsersServices(ContextInfoGuia context, IMapper mapper)
+		public UsersServices(Context context, IMapper mapper)
 		{
 			_context = context;
 			_mapper = mapper;
@@ -72,7 +72,7 @@ namespace Api.Infrastructure.Services
                 where us.UserId == data.User.UserId
                 select new Jwt_Claims_BracnhOffice
                 {
-                    BranchId = bo.BranchOfficeId ?? 0,
+                    BranchId = bo.BranchOfficeId ,
                     Description = bo.Name,
                     PointSale = bo.SalesPoint
                 }

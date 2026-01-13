@@ -11,12 +11,12 @@ namespace Api.Infrastructure.Services.Categories;
 public class CategorieServices : ICategorieServices
 {
     private readonly IMapper _mapper;
-    private readonly ContextInfoGuia _context;
+    private readonly Context _context;
     private readonly ILogger<CategorieServices> _logger;
 
     public CategorieServices(
         IMapper mapper,
-        ContextInfoGuia context,
+        Context context,
         ILogger<CategorieServices> logger)
     {
         _mapper = mapper;

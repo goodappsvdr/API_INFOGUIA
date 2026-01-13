@@ -8,12 +8,12 @@ namespace Api.Infrastructure.Services.Listings
 {
     public class ListingsServices : IListingsServices
     {
-        private readonly ContextInfoGuia _context;
+        private readonly Context _context;
         private readonly IMapper _mapper;
         private readonly ILogger<ListingsServices> _logger;
 
         public ListingsServices(
-            ContextInfoGuia context,
+            Context context,
             IMapper mapper,
             ILogger<ListingsServices> logger)
         {
@@ -78,6 +78,16 @@ namespace Api.Infrastructure.Services.Listings
                 await _context.SaveChangesAsync();
 
                 _logger.LogInformation("Listing {ListingId} created by user {UserId}", listing.ListingId, userId);
+
+                // Agrego la relacion entre usuarios y listing
+
+                _context.ListingUsers.Add(new ListingUser
+                {
+                    ListingId = listing.ListingId,
+                    UserId = Convert.ToInt32(userId)
+                });
+
+                await _context.SaveChangesAsync();
 
                 return _mapper.Map<ListingDTO>(listing);
             }

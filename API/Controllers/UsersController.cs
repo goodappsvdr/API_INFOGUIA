@@ -17,7 +17,7 @@ namespace Api.Controllers
     [ApiController, AllowAnonymous, Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
-        private readonly ContextInfoGuia _context;
+        private readonly Context _context;
         private readonly IUsersServices _usersServices;
         private readonly Jwt_AccessTokenSettings _accessTokenSettings;
         private readonly Jwt_RefreshTokenSettings _refreshTokenSettings;
@@ -32,7 +32,7 @@ namespace Api.Controllers
         IUsersServices usersServices,
         Jwt_AccessTokenSettings accessTokenSettings,
         Jwt_RefreshTokenSettings refreshTokenSettings,
-        ContextInfoGuia context)
+        Context context)
         {
             _usersServices = usersServices;
             _accessTokenSettings = accessTokenSettings;

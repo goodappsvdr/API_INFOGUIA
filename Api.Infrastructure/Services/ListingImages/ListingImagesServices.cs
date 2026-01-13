@@ -10,12 +10,12 @@ namespace Api.Infrastructure.Services.ListingImagesServices
 {
     public class ListingImagesServices : IListingImagesServices
     {
-        private readonly ContextInfoGuia _context;
+        private readonly Context _context;
         private readonly IMapper _mapper;
         private readonly ILogger<ListingImagesServices> _logger;
 
         public ListingImagesServices(
-            ContextInfoGuia context,
+            Context  context,
             IMapper mapper,
             ILogger<ListingImagesServices> logger)
         {

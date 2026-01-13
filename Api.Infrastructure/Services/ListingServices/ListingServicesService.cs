@@ -8,12 +8,12 @@ namespace Api.Infrastructure.Services.ListingServices
 {
     public class ListingServicesService : IListingServicesService
     {
-        private readonly ContextInfoGuia _context;
+        private readonly Context _context;
         private readonly IMapper _mapper;
         private readonly ILogger<ListingServicesService> _logger;
 
         public ListingServicesService(
-            ContextInfoGuia context,
+            Context context,
             IMapper mapper,
             ILogger<ListingServicesService> logger)
         {

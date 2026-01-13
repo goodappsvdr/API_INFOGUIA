@@ -8,12 +8,12 @@ namespace Api.Infrastructure.Services.Roles
 {
     public class RolesServices : IRolesServices
     {
-        private readonly ContextInfoGuia _context;
+        private readonly Context _context;
         private readonly IMapper _mapper;
         private readonly ILogger<RolesServices> _logger;
 
         public RolesServices(
-            ContextInfoGuia context,
+                Context  context,
             IMapper mapper,
             ILogger<RolesServices> logger)
         {

@@ -8,12 +8,12 @@ namespace Api.Infrastructure.Services.ListingSocialLinks
 {
     public class ListingSocialLinksServices : IListingSocialLinksServices
     {
-        private readonly ContextInfoGuia _context;
+        private readonly Context _context;
         private readonly IMapper _mapper;
         private readonly ILogger<ListingSocialLinksServices> _logger;
 
         public ListingSocialLinksServices(
-            ContextInfoGuia context,
+            Context context,
             IMapper mapper,
             ILogger<ListingSocialLinksServices> logger)
         {
