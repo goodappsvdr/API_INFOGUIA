@@ -8,7 +8,9 @@ using API.Filters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
-
+/// <summary>
+/// Controlador de Categorias
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 [JwtAuthorization]

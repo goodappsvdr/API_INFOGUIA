@@ -6,6 +6,9 @@ using System.Security.Claims;
 
 namespace Api.Controllers
 {
+    /// <summary>
+    /// Controlador de Telefonos de Listing
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]

@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    /// <summary>
+    /// Controlador de Horas de Listing
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     [JwtAuthorization]
