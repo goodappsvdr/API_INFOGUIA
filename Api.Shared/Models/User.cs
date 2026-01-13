@@ -5,9 +5,9 @@ namespace Api.Shared.Models;
 
 public partial class User
 {
-    public int? UserId { get; set; }
+    public int UserId { get; set; }
 
-    public int? TenantId { get; set; }
+    public int TenantId { get; set; }
 
     public int RoleId { get; set; }
 
@@ -45,16 +45,9 @@ public partial class User
 
     public virtual Role Role { get; set; } = null!;
 
-    public virtual Tenant? Tenant { get; set; }
+    public virtual Tenant Tenant { get; set; } = null!;
 
     public virtual ICollection<Tenant> TenantCreatedByUsers { get; set; } = new List<Tenant>();
 
     public virtual ICollection<Tenant> TenantModifiedByUsers { get; set; } = new List<Tenant>();
-}
-
-public class createUser_Input
-{
-    public string? email { get; set; }
-    public string? password { get; set; }
-
 }
