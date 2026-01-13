@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 using Google.Apis.Auth;
+using Api.Shared.DTOs.Users;
 
 namespace Api.Controllers
 {

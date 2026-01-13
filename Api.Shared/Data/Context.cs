@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using Api.Shared.Models;
 using Microsoft.EntityFrameworkCore;
-using DirectoryEntity = Api.Shared.Models.Directory;
-
 
 namespace Api.Shared.Data;
 
@@ -24,7 +22,7 @@ public partial class Context : DbContext
 
     public virtual DbSet<Country> Countries { get; set; }
 
-    public virtual DbSet<Api.Shared.Models.Directory> Directories { get; set; }
+   public virtual DbSet<Api.Shared.Models.Directory> Directories { get; set; }
 
     public virtual DbSet<Listing> Listings { get; set; }
 
@@ -43,6 +41,8 @@ public partial class Context : DbContext
     public virtual DbSet<ListingSocialLink> ListingSocialLinks { get; set; }
 
     public virtual DbSet<ListingTag> ListingTags { get; set; }
+
+    public virtual DbSet<ListingUser> ListingUsers { get; set; }
 
     public virtual DbSet<PaymentMethod> PaymentMethods { get; set; }
 
@@ -156,7 +156,7 @@ public partial class Context : DbContext
             entity.Property(e => e.Name).HasMaxLength(100);
         });
 
-        modelBuilder.Entity<DirectoryEntity>(entity =>
+        modelBuilder.Entity<Api.Shared.Models.Directory>(entity =>
         {
             entity.HasKey(e => e.DirectoryId).HasName("PK__Director__3D93EF02310A129E");
 
@@ -300,6 +300,13 @@ public partial class Context : DbContext
             entity.Property(e => e.ModifiedByUserId).HasColumnName("ModifiedByUserID");
         });
 
+        modelBuilder.Entity<ListingUser>(entity =>
+        {
+            entity.Property(e => e.ListingUserId).HasColumnName("ListingUserID");
+            entity.Property(e => e.ListingId).HasColumnName("ListingID");
+            entity.Property(e => e.UserId).HasColumnName("UserID");
+        });
+
         modelBuilder.Entity<PaymentMethod>(entity =>
         {
             entity.HasKey(e => e.PaymentMethodId).HasName("PK__PaymentM__DC31C1F3A5B8D7A3");
@@ -341,9 +348,7 @@ public partial class Context : DbContext
 
             entity.HasIndex(e => e.Name, "UQ__Roles__737584F6B9F64D24").IsUnique();
 
-            entity.Property(e => e.RoleId)
-                .ValueGeneratedNever()
-                .HasColumnName("RoleID");
+            entity.Property(e => e.RoleId).HasColumnName("RoleID");
             entity.Property(e => e.Name).HasMaxLength(50);
         });
 
@@ -459,6 +464,7 @@ public partial class Context : DbContext
 
             entity.HasOne(d => d.Tenant).WithMany(p => p.Users)
                 .HasForeignKey(d => d.TenantId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Users_Tenants");
         });
 
