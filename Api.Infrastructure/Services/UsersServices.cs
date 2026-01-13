@@ -55,7 +55,7 @@ namespace Api.Infrastructure.Services
 
             Jwt_Claims claim = new Jwt_Claims
             {
-                UserId = data.User.UserId ?? 0,
+                UserId = data.User.UserId ,
                 Email = data.User.Email,
                 FirstName = data.User.FirstName,
                 LastName = data.User.LastName,

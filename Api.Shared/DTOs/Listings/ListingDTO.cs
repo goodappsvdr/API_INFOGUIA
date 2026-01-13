@@ -49,6 +49,7 @@ namespace Api.Shared.DTOs.Listings
         public string? CatalogUrl { get; set; }
 
         public int SortOrder { get; set; }
+        public int UserId { get; set; }
 
 
     }
@@ -71,6 +72,7 @@ namespace Api.Shared.DTOs.Listings
         public string? CatalogUrl { get; set; }
         public int SortOrder { get; set; }
         public bool IsActive { get; set; }
+        public bool UserId { get; set; }
 
     }
 }

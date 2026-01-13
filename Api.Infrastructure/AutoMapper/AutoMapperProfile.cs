@@ -47,6 +47,7 @@ namespace Api.Infrastructure.AutoMapper
                 .ForMember(d => d.ModifiedAt, o => o.Ignore())
                 .ForMember(d => d.ModifiedByUserId, o => o.Ignore());
 
+
             // UpdateListingDTO -> Listing
             CreateMap<UpdateListingDTO, Listing>()
                 .ForMember(d => d.ListingId, o => o.MapFrom(s => s.Id))
