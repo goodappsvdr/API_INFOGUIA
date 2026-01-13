@@ -1,0 +1,22 @@
+﻿namespace Api.Shared.DTOs.Roles
+{
+    public class RoleDto
+    {
+        public int RoleId { get; set; }
+        public string Name { get; set; } = string.Empty;
+    }
+}
+
+namespace Api.Shared.DTOs.Roles
+{
+    public class CreateRoleDto
+    {
+        public string Name { get; set; } = string.Empty;
+    }
+
+    public class UpdateRoleDto
+    {
+        public int RoleId { get; set; }
+        public string Name { get; set; } = string.Empty;
+    }
+}

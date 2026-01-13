@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
 {
+    /// <summary>
+    /// Controlador de Elementos de Pago de Listing
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     [JwtAuthorization]
