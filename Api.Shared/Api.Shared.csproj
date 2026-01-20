@@ -7,6 +7,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Models\Dynamic\**" />
+	  <EmbeddedResource Remove="Models\Dynamic\**" />
+	  <None Remove="Models\Dynamic\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="AspNetCore.HealthChecks" Version="1.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.13" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
