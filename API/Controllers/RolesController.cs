@@ -1,18 +1,17 @@
 ﻿using API.Extensions;
 using API.Filters;
 using Api.Infrastructure.Exceptions;
-using Api.Infrastructure.Services.Roles; // Asumiendo este namespace
+using Api.Infrastructure.Services.Roles; 
 using Api.Shared.DTOs;
-using Api.Shared.DTOs.Roles; // Asumiendo este namespace
+using Api.Shared.DTOs.Roles;
 using Microsoft.AspNetCore.Mvc;
-using Api.Infrastructure.Services.ListingSocialLinks;
 
 namespace API.Controllers
 {
     /// <summary>
     /// Controlador de Roles
     /// </summary>
-    [Route("api/roles")]
+    [Route("api/Roles")]
     [ApiController]
     [JwtAuthorization]
     public class RolesController : ControllerBase
@@ -54,6 +53,7 @@ namespace API.Controllers
         /// <summary>
         /// Obtiene un rol específico por su ID
         /// </summary>
+        /// 
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(ApiResponse<RoleDto>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetById(int id)
@@ -80,7 +80,8 @@ namespace API.Controllers
         /// <summary>
         /// Crea un nuevo rol
         /// </summary>
-        [HttpPost]
+        /// 
+        [HttpPost("CreateRole")]
         [ProducesResponseType(typeof(ApiResponse<RoleDto>), StatusCodes.Status201Created)]
         public async Task<IActionResult> Create([FromBody] CreateRoleDto dto)
         {
