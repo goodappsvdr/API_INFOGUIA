@@ -6,6 +6,12 @@ using Api.Shared.DTOs.Auth;
 using Microsoft.AspNetCore.Mvc;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Api.Shared.DTOs.Categories;
+using Api.Shared.DTOs.Users;
+using Microsoft.Extensions.Logging;
+using Api.Infrastructure.Services.Categories;
+using Api.Infrastructure.Exceptions;
+using Api.Shared.DTOs.Listings;
 
 namespace Api.Infrastructure.Services
 {
@@ -13,12 +19,17 @@ namespace Api.Infrastructure.Services
 	{
 		private readonly ContextInfoGuia _context;
 		private readonly IMapper _mapper;
+        private readonly ILogger<UsersServices> _logger;
 
-		public UsersServices(ContextInfoGuia context, IMapper mapper)
-		{
+        public UsersServices(
+            ContextInfoGuia context,
+            IMapper mapper,
+            ILogger<UsersServices> logger)
+        {
 			_context = context;
 			_mapper = mapper;
-		}
+            _logger = logger;
+        }
 
          
         public async Task<bool> LoginAsync(Auth_Login login)
@@ -79,6 +90,92 @@ namespace Api.Infrastructure.Services
             ).ToListAsync();
 
             return claim;
+        }
+
+
+        /// <summary>
+        /// Buscar todos los usuarios
+        /// </summary>
+        public async Task<List<UserDto>> GetAllUserAsync()
+        {
+            try
+            {
+                var users = await _context.Users
+                    .AsNoTracking()
+                    .OrderBy(c => c.UserId)
+                    .ToListAsync();
+
+                return _mapper.Map<List<UserDto>>(users);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving all categories");
+                throw;
+            }
+        }
+
+
+        /// <summary>
+        /// Buscar usuario por ID
+        /// </summary>
+        public async Task<List<UserDto>> GetByUserIdAsync(int userId)
+        {
+            try
+            {
+                // Usamos .Where() para obtener una colección filtrada
+                var users = await _context.Users
+                    .AsNoTracking()
+                    .Where(u => u.UserId == userId)
+                    .ToListAsync();
+
+                // El mapper transformará List<User> a List<UserDto> automáticamente
+                return _mapper.Map<List<UserDto>>(users);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving user with ID: {UserId}", userId);
+                throw;
+            }
+        }
+
+        public async Task<UpdateUserDto> UpdateUserAsync(int userID, UpdateUserDto updateUserDto)
+        {
+            try
+            {
+                var user = await _context.Users
+                    .FirstOrDefaultAsync(x => x.UserId == userID);
+
+                if (user == null)
+                {
+                    throw new NotFoundException($"user with ID {userID} not found");
+                }
+
+                // Aquí podrías agregar la validación de propiedad si fuera necesaria:
+                // if (user.UserId != currentUserId) throw new UnauthorizedException("...");
+
+                _mapper.Map(updateUserDto, user);
+                user.ModifiedAt = DateTime.UtcNow;
+                user.ModifiedByUserId = userID;
+
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("user {userId} updated by user {CurrentUserId}", user.UserId, userID);
+
+                return _mapper.Map<UpdateUserDto>(user);
+            }
+            catch (NotFoundException)
+            {
+                throw;
+            }
+            catch (UnauthorizedException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating User {UserId}", userID);
+                throw;
+            }
         }
 
     }

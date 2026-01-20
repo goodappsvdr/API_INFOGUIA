@@ -7,6 +7,7 @@ using Api.Shared.DTOs.Listings;
 using Api.Shared.DTOs.ListingServices;
 using Api.Shared.DTOs.ListingSocialLinks;
 using Api.Shared.DTOs.Roles;
+using Api.Shared.DTOs.Users;
 using Api.Shared.Models;
 using MimeKit;
 
@@ -263,6 +264,18 @@ namespace Api.Infrastructure.AutoMapper
             CreateMap<Category, CategoryWithStatsDTO>()
                 .ForMember(d => d.Id, o => o.MapFrom(s => s.CategoryId))
                 .ForMember(d => d.ListingCount, o => o.Ignore()); // Se calcula manualmente usualmente
+
+
+            // ========== USERS ==========
+
+            // Mapeo de Entidad a DTO
+            CreateMap<User, UserDto>()
+                .ForMember(dest => dest.userId, opt => opt.MapFrom(src => src.UserId));
+            // Nota: Si en UserDto la propiedad se llama 'UserId' igual que en la entidad, 
+            // solo necesitas: CreateMap<User, UserDto>();
+
+            // Si necesitas el camino inverso (de DTO a Entidad)
+            CreateMap<UserDto, User>();
         }
     }
 }

@@ -8,6 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.RegularExpressions;
 using Google.Apis.Auth;
 using Api.Shared.DTOs.Users;
+using API.Extensions;
+using Api.Infrastructure.Exceptions;
+using Api.Shared.DTOs.Listings;
+using Api.Shared.DTOs;
+using API.Controllers;
 
 namespace Api.Controllers
 {
@@ -21,6 +26,7 @@ namespace Api.Controllers
         private readonly IUsersServices _usersServices;
         private readonly Jwt_AccessTokenSettings _accessTokenSettings;
         private readonly Jwt_RefreshTokenSettings _refreshTokenSettings;
+        private readonly ILogger<ListingsController> _logger;
 
         /// <summary>
         /// Constructor para inicializar el controlador de Usuarios
@@ -32,12 +38,15 @@ namespace Api.Controllers
         IUsersServices usersServices,
         Jwt_AccessTokenSettings accessTokenSettings,
         Jwt_RefreshTokenSettings refreshTokenSettings,
-        ContextInfoGuia context)
+        ContextInfoGuia context,
+         ILogger<ListingsController> logger)
+
         {
             _usersServices = usersServices;
             _accessTokenSettings = accessTokenSettings;
             _refreshTokenSettings = refreshTokenSettings;
             _context = context;
+         _logger = logger;
         }
 
 
@@ -263,8 +272,134 @@ namespace Api.Controllers
             }
         }
 
+        /// <summary>
+        /// Crear un nuevo Usuario Desde Super Admin
+        /// </summary>
+        /// 
+        [HttpPost("CreateUserSuperAdmin")]
+        public async Task<ActionResult> CreateUserSuperAdminAsync(createUserSuperAdmin_Input input)
+        {
+            try
+            {
+                var usermodel = new User
+                {
+                    TenantId = 1,
+                    RoleId = input.roleId ?? 1,
+                    Email = input.email ?? string.Empty,
+                    PasswordHash = input.password ?? string.Empty,
+                    FirstName = input.firstName,
+                    LastName = "",
+                    ImgProfile = "",
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedByUserId = input.userId,
+                    ModifiedAt = DateTime.UtcNow,
+                    ModifiedByUserId = input.userId
+                };
+
+                _context.Users.Add(usermodel);
+                await _context.SaveChangesAsync();
+
+                return Ok(usermodel.UserId);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    Error = "Error creando usuario",
+                    Detalle = ex.Message,
+                    Inner = ex.InnerException?.Message
+                });
+            }
+        }
 
 
+        /// <summary>
+        /// Obtiene todos los Usuarios
+        /// </summary>
+        [Authorize, HttpGet("GetAllUser")]
+        public async Task<ActionResult> GetAllUserAsync()
+        {
+           
+            try
+            {
+                var user = await _usersServices.GetAllUserAsync();
+
+                if (user == null) return NoContent();
+
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex);
+            }
+        }
+
+        /// <summary>
+        /// Obtiene un usuario por ID
+        /// </summary>
+        [Authorize, HttpGet("GetByUserId")]
+        public async Task<ActionResult> GetByUserIdAsync(int userId)
+        {
+
+            try
+            {
+                var user = await _usersServices.GetByUserIdAsync(userId);
+
+                if (user == null) return NoContent();
+
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex);
+            }
+        }
+
+        ///// <summary>
+        ///// Obtiene un usuario por ID
+        ///// </summary>
+        //[Authorize, HttpPut("UpdateUser")]
+        //public async Task<IActionResult> UpdateUserAsync(int userId, [FromBody] UpdateUserDto updateUserDto)
+        //{
+        //    try
+        //    {
+        //        if (userId != null)
+        //        {
+        //            return BadRequest(ApiResponse<object>.ErrorResponse("ID in URL doesn't match ID in body"));
+        //        }
+
+        //        // Convertimos el ID del contexto (string) a int para que coincida con la firma del servicio
+        //        if (!int.TryParse(HttpContext.GetUserId(), out int currentAuthenticatedUserId))
+        //        {
+        //            return Unauthorized(ApiResponse<object>.ErrorResponse("Invalid user identifier in token"));
+        //        }
+
+        //        var updatedUser = await _usersServices.UpdateUserAsync(currentAuthenticatedUserId, updateUserDto);
+
+        //        return Ok(ApiResponse<UpdateUserDto>.SuccessResponse(updatedUser, "User updated successfully"));
+        //    }
+        //    catch (NotFoundException ex)
+        //    {
+        //        _logger.LogWarning(ex, "User not found: {UserId}", userId);
+        //        return NotFound(ApiResponse<object>.ErrorResponse(ex.Message));
+        //    }
+        //    catch (UnauthorizedException ex)
+        //    {
+        //        _logger.LogWarning(ex, "User doesn't own User: {UserId}", userId);
+        //        return StatusCode(403, ApiResponse<object>.ErrorResponse(ex.Message));
+        //    }
+        //    catch (BadRequestException ex)
+        //    {
+        //        _logger.LogWarning(ex, "Bad request while updating User: {UserId}", userId);
+        //        return BadRequest(ApiResponse<object>.ErrorResponse(ex.Message));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error updating User {UserId}", userId);
+        //        return StatusCode(500, ApiResponse<object>.ErrorResponse("An error occurred while updating the User"));
+        //    }
+        //}
 
     }
 }
