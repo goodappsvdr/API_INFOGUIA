@@ -23,26 +23,30 @@ namespace Api.Infrastructure.Services.Roles
         }
 
         // ===================== CREATE =====================
-
         public async Task<RoleDto> CreateAsync(CreateRoleDto dto)
         {
-            // Validar si ya existe un rol con el mismo nombre
             var duplicated = await _context.Roles
                 .AnyAsync(x => x.Name.ToLower() == dto.Name.ToLower());
-
             if (duplicated)
                 throw new BadRequestException($"The role '{dto.Name}' already exists.");
 
-            // Suponiendo que tu entidad se llama Role
+            // CreateRoleDto → Role (entidad de BD)
             var entity = _mapper.Map<Role>(dto);
 
+            // Agregar a la BD
             _context.Roles.Add(entity);
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation("New role created: {RoleName} with ID {Id}", entity.Name, entity.RoleId);
+            _logger.LogInformation(
+                "New role created: {RoleName} with ID {Id}",
+                entity.Name,
+                entity.RoleId
+            );
 
+            // Role (entidad) → RoleDto (para devolver)
             return _mapper.Map<RoleDto>(entity);
         }
+
 
         // ===================== GET ALL =====================
 

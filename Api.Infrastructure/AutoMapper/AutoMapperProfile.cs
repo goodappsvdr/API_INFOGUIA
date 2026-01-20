@@ -1,10 +1,12 @@
-﻿using Api.Shared.DTOs.ListingHours;
+﻿using Api.Shared.DTOs.Categories;
+using Api.Shared.DTOs.ListingHours;
 using Api.Shared.DTOs.ListingImages;
 using Api.Shared.DTOs.ListingPaymentMethods;
 using Api.Shared.DTOs.ListingPhones;
 using Api.Shared.DTOs.Listings;
 using Api.Shared.DTOs.ListingServices;
 using Api.Shared.DTOs.ListingSocialLinks;
+using Api.Shared.DTOs.Roles;
 using Api.Shared.Models;
 using MimeKit;
 
@@ -221,6 +223,46 @@ namespace Api.Infrastructure.AutoMapper
             CreateMap<ListingPaymentMethod, UpdateListingPaymentMethodsDTO>()
                 .ForMember(d => d.Id, o => o.MapFrom(s => s.PaymentMethodId));
 
+
+            // ========== ROLES ==========
+
+
+            // CreateRoleDto -> Role (entidad)
+            CreateMap<CreateRoleDto, Role>()
+                .ForMember(d => d.RoleId, o => o.Ignore()); // El ID se genera automáticamente
+
+            // Role (entidad) -> RoleDto
+            CreateMap<Role, RoleDto>();
+
+
+            // ========== CATEGORIES ==========
+
+            // AddCategoryDTO -> Category
+            CreateMap<AddCategoryDTO, Category>()
+                .ForMember(d => d.CategoryId, o => o.Ignore())
+                .ForMember(d => d.TenantId, o => o.Ignore()) // Se suele asignar en el servicio
+                .ForMember(d => d.IsActive, o => o.MapFrom(_ => true))
+                .ForMember(d => d.CreatedAt, o => o.Ignore())
+                .ForMember(d => d.CreatedByUserId, o => o.Ignore())
+                .ForMember(d => d.ModifiedAt, o => o.Ignore())
+                .ForMember(d => d.ModifiedByUserId, o => o.Ignore());
+
+            // Category -> CategorieDTO
+            CreateMap<Category, CategorieDTO>()
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.CategoryId));
+
+            // UpdateCategoryDTO -> Category
+            CreateMap<UpdateCategoryDTO, Category>()
+                .ForMember(d => d.CategoryId, o => o.MapFrom(s => s.Id))
+                .ForMember(d => d.CreatedAt, o => o.Ignore())
+                .ForMember(d => d.CreatedByUserId, o => o.Ignore())
+                .ForMember(d => d.ModifiedAt, o => o.Ignore())
+                .ForMember(d => d.ModifiedByUserId, o => o.Ignore());
+
+            // Category -> CategoryWithStatsDTO
+            CreateMap<Category, CategoryWithStatsDTO>()
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.CategoryId))
+                .ForMember(d => d.ListingCount, o => o.Ignore()); // Se calcula manualmente usualmente
         }
     }
 }
