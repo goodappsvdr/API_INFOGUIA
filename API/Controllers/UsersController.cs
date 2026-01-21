@@ -356,50 +356,49 @@ namespace Api.Controllers
             }
         }
 
-        ///// <summary>
-        ///// Obtiene un usuario por ID
-        ///// </summary>
-        //[Authorize, HttpPut("UpdateUser")]
-        //public async Task<IActionResult> UpdateUserAsync(int userId, [FromBody] UpdateUserDto updateUserDto)
-        //{
-        //    try
-        //    {
-        //        if (userId != null)
-        //        {
-        //            return BadRequest(ApiResponse<object>.ErrorResponse("ID in URL doesn't match ID in body"));
-        //        }
+        /// <summary>
+        /// Actualiza la información de un usuario
+        /// </summary>
+        /// <param name="id">ID del usuario a actualizar (desde la URL)</param>
+        /// <param name="updateUserDto">Objeto con los nuevos datos</param>
+        [Authorize]
+        [HttpPut("UpdateUser/{id}")]
+        [ProducesResponseType(typeof(ApiResponse<UpdateUserDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateUserAsync(int id, [FromBody] UpdateUserDto updateUserDto)
+        {
+            try
+            {
+              
 
-        //        // Convertimos el ID del contexto (string) a int para que coincida con la firma del servicio
-        //        if (!int.TryParse(HttpContext.GetUserId(), out int currentAuthenticatedUserId))
-        //        {
-        //            return Unauthorized(ApiResponse<object>.ErrorResponse("Invalid user identifier in token"));
-        //        }
+                // 2. Llamar al servicio
+                var updatedUser = await _usersServices.UpdateUserAsync(id, updateUserDto);
 
-        //        var updatedUser = await _usersServices.UpdateUserAsync(currentAuthenticatedUserId, updateUserDto);
-
-        //        return Ok(ApiResponse<UpdateUserDto>.SuccessResponse(updatedUser, "User updated successfully"));
-        //    }
-        //    catch (NotFoundException ex)
-        //    {
-        //        _logger.LogWarning(ex, "User not found: {UserId}", userId);
-        //        return NotFound(ApiResponse<object>.ErrorResponse(ex.Message));
-        //    }
-        //    catch (UnauthorizedException ex)
-        //    {
-        //        _logger.LogWarning(ex, "User doesn't own User: {UserId}", userId);
-        //        return StatusCode(403, ApiResponse<object>.ErrorResponse(ex.Message));
-        //    }
-        //    catch (BadRequestException ex)
-        //    {
-        //        _logger.LogWarning(ex, "Bad request while updating User: {UserId}", userId);
-        //        return BadRequest(ApiResponse<object>.ErrorResponse(ex.Message));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error updating User {UserId}", userId);
-        //        return StatusCode(500, ApiResponse<object>.ErrorResponse("An error occurred while updating the User"));
-        //    }
-        //}
-
+                return Ok(ApiResponse<UpdateUserDto>.SuccessResponse(updatedUser, "Usuario actualizado correctamente."));
+            }
+            catch (NotFoundException ex)
+            {
+                _logger.LogWarning(ex, "Usuario no encontrado: {UserId}", id);
+                return NotFound(ApiResponse<object>.ErrorResponse(ex.Message));
+            }
+            catch (UnauthorizedException ex)
+            {
+                _logger.LogWarning(ex, "No autorizado para actualizar usuario: {UserId}", id);
+                return StatusCode(403, ApiResponse<object>.ErrorResponse(ex.Message));
+            }
+            catch (BadRequestException ex)
+            {
+                _logger.LogWarning(ex, "Petición incorrecta al actualizar usuario: {UserId}", id);
+                return BadRequest(ApiResponse<object>.ErrorResponse(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error crítico al actualizar usuario {UserId}", id);
+                return StatusCode(500, ApiResponse<object>.ErrorResponse("Ocurrió un error interno al actualizar el usuario."));
+            }
+        }
     }
 }

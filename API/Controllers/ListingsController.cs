@@ -48,7 +48,7 @@ namespace API.Controllers
 
                 return CreatedAtAction(
                     nameof(GetListingById),
-                    new { id = createdListing.Id },
+                    new { id = createdListing.UserId},
                     ApiResponse<ListingDTO>.SuccessResponse(createdListing, "Listing created successfully")
                 );
             }
@@ -123,10 +123,10 @@ namespace API.Controllers
         /// Updates an existing listing
         /// </summary>
         /// <param name="id">Listing ID</param>
-        /// <param name="listingDto">Updated listing data</param>
+        /// <param name="listingDto">Updated listing data (UpdateListingDTO)</param>
         /// <returns>Updated listing</returns>
         /// <response code="200">Listing updated successfully</response>
-        /// <response code="400">Invalid data or ID mismatch</response>
+        /// <response code="400">Invalid data</response>
         /// <response code="403">User doesn't own this listing</response>
         /// <response code="404">Listing not found</response>
         [HttpPut("{id}")]
@@ -134,17 +134,16 @@ namespace API.Controllers
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateListing(int id, [FromBody] ListingDTO listingDto)
+        // CAMBIO: Usamos UpdateListingDTO en el Body y eliminamos el parámetro extra listingId
+        public async Task<IActionResult> UpdateListing(int id, [FromBody] UpdateListingDTO listingDto)
         {
             try
             {
-                if (id != listingDto.Id)
-                {
-                    return BadRequest(ApiResponse<object>.ErrorResponse("ID in URL doesn't match ID in body"));
-                }
-
+                // El ID viene de la URL ({id}), se lo pasamos directamente al servicio
                 var userId = HttpContext.GetUserId();
-                var updatedListing = await _listingsServices.UpdateListingAsync(userId, listingDto);
+
+                // CAMBIO: Enviamos 'id' como el identificador del listing
+                var updatedListing = await _listingsServices.UpdateListingAsync(userId, listingDto, id);
 
                 return Ok(ApiResponse<ListingDTO>.SuccessResponse(updatedListing, "Listing updated successfully"));
             }

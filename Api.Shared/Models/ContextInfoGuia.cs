@@ -476,10 +476,10 @@ public partial class ContextInfoGuia : DbContext
                 .HasForeignKey(d => d.ModifiedByUserId)
                 .HasConstraintName("FK_Users_ModifiedByUser");
 
-            entity.HasOne(d => d.Role).WithMany(p => p.Users)
-                .HasForeignKey(d => d.RoleId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Users_Roles");
+            //entity.HasOne(d => d.Role).WithMany(p => p.Users)
+            //    .HasForeignKey(d => d.RoleId)
+            //    .OnDelete(DeleteBehavior.ClientSetNull)
+            //    .HasConstraintName("FK_Users_Roles");
 
             entity.HasOne(d => d.Tenant).WithMany(p => p.Users)
                 .HasForeignKey(d => d.TenantId)

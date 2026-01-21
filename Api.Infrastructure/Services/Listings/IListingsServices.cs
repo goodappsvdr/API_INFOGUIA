@@ -7,6 +7,7 @@ namespace Api.Infrastructure.Services.Listings
         Task<ListingDTO> CreateListingAsync(string userId, AddListingDTO listingDto);
         Task<List<ListingDTO>> GetAllListingsAsync();
         Task<ListingDTO> GetListingByIdAsync(int id);
-        Task<ListingDTO> UpdateListingAsync(string userId, ListingDTO listingDto);
+        // Antes decía ListingDTO, cámbialo a UpdateListingDTO
+        Task<ListingDTO> UpdateListingAsync(string userId, UpdateListingDTO listingDto, int listingId);
     }
 }

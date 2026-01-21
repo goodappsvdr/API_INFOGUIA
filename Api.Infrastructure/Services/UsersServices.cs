@@ -142,39 +142,42 @@ namespace Api.Infrastructure.Services
         {
             try
             {
+                // 1. Buscar el usuario incluyendo las validaciones necesarias
                 var user = await _context.Users
                     .FirstOrDefaultAsync(x => x.UserId == userID);
 
                 if (user == null)
                 {
-                    throw new NotFoundException($"user with ID {userID} not found");
+                    throw new NotFoundException($"User with ID {userID} not found");
                 }
 
-                // Aquí podrías agregar la validación de propiedad si fuera necesaria:
-                // if (user.UserId != currentUserId) throw new UnauthorizedException("...");
-
+                // 2. Mapeo de datos: Volcamos lo que viene del DTO al objeto 'user' rastreado por EF
                 _mapper.Map(updateUserDto, user);
+
+                // 3. Auditoría: Forzamos los valores de modificación
                 user.ModifiedAt = DateTime.UtcNow;
+
+                // Convertimos a string si tu entidad espera un GUID o String, 
+                // de lo contrario, deja solo userID si es int en la DB.
                 user.ModifiedByUserId = userID;
 
+                // 4. Guardar cambios
                 await _context.SaveChangesAsync();
 
-                _logger.LogInformation("user {userId} updated by user {CurrentUserId}", user.UserId, userID);
+                _logger.LogInformation("User {UserId} updated successfully", userID);
 
+                // 5. Devolver el DTO actualizado (Mapeo inverso)
                 return _mapper.Map<UpdateUserDto>(user);
             }
             catch (NotFoundException)
             {
-                throw;
-            }
-            catch (UnauthorizedException)
-            {
+                // Re-lanzamos para que el controlador lo capture
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating User {UserId}", userID);
-                throw;
+                _logger.LogError(ex, "Error fatal al actualizar el usuario {UserId}", userID);
+                throw; // Importante no perder el stack trace
             }
         }
 

@@ -1,8 +1,11 @@
 ﻿using Api.Infrastructure.Exceptions;
+using Api.Infrastructure.Services.Interface;
 using Api.Shared.DTOs.Listings;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims; // Necesario para Claims
+using Api.Infrastructure.Services.Interface;
 
 namespace Api.Infrastructure.Services.Listings
 {
@@ -11,15 +14,21 @@ namespace Api.Infrastructure.Services.Listings
         private readonly ContextInfoGuia _context;
         private readonly IMapper _mapper;
         private readonly ILogger<ListingsServices> _logger;
+        private readonly IUsersServices _userServices; // 1. Inyectar el servicio de usuario
+        private readonly IHttpContextAccessor _httpContext; // 2. Para obtener el username del token
 
         public ListingsServices(
             ContextInfoGuia context,
             IMapper mapper,
-            ILogger<ListingsServices> logger)
+            ILogger<ListingsServices> logger,
+            IUsersServices userServices,
+            IHttpContextAccessor httpContext)
         {
             _context = context;
             _mapper = mapper;
             _logger = logger;
+            _userServices = userServices;
+            _httpContext = httpContext;
         }
 
         public async Task<List<ListingDTO>> GetAllListingsAsync()
@@ -88,16 +97,18 @@ namespace Api.Infrastructure.Services.Listings
             }
         }
 
-        public async Task<ListingDTO> UpdateListingAsync(string userId, ListingDTO listingDto)
+        public async Task<ListingDTO> UpdateListingAsync(string userId, UpdateListingDTO listingDto, int listingId)
         {
             try
             {
+                
+
                 var listing = await _context.Listings
-                    .FirstOrDefaultAsync(x => x.ListingId == listingDto.Id);
+                    .FirstOrDefaultAsync(x => x.ListingId == listingId);
 
                 if (listing == null)
                 {
-                    throw new NotFoundException($"Listing with ID {listingDto.Id} not found");
+                    throw new NotFoundException($"Listing with ID {listingId} not found");
                 }
 
                 // Verificar que el usuario sea el dueño del listing
@@ -126,7 +137,7 @@ namespace Api.Infrastructure.Services.Listings
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating listing {ListingId}", listingDto.Id);
+                _logger.LogError(ex, "Error updating listing {ListingId}", listingId);
                 throw;
             }
         }

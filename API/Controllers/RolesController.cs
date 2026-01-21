@@ -80,19 +80,21 @@ namespace API.Controllers
         /// <summary>
         /// Crea un nuevo rol
         /// </summary>
-        /// 
         [HttpPost("CreateRole")]
         [ProducesResponseType(typeof(ApiResponse<RoleDto>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Create([FromBody] CreateRoleDto dto)
         {
+            if (dto == null) return BadRequest(ApiResponse<object>.ErrorResponse("Datos inválidos"));
+
             try
             {
                 var created = await _roleService.CreateAsync(dto);
-                return CreatedAtAction(
-                    nameof(GetById),
-                    new { id = created.RoleId },
-                    ApiResponse<RoleDto>.SuccessResponse(created, "Role created successfully")
-                );
+
+                // IMPORTANTE: Si el error 500 persiste aquí, asegúrate de tener un 
+                // método llamado GetById(int id). Si no lo tienes, usa Ok() en su lugar.
+                // Cambia esto en el Controller
+                return Ok(ApiResponse<RoleDto>.SuccessResponse(created, "Role created successfully"));
             }
             catch (BadRequestException ex)
             {
@@ -100,9 +102,10 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error creating role");
-                return StatusCode(500, ApiResponse<object>.ErrorResponse("Error creating role"));
+                _logger.LogError(ex, "Error al crear rol");
+                return StatusCode(500, ApiResponse<object>.ErrorResponse(ex.InnerException?.Message ?? ex.Message));
             }
+
         }
     }
 }

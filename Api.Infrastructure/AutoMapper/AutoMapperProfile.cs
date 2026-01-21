@@ -37,7 +37,7 @@ namespace Api.Infrastructure.AutoMapper
 
             // Listing -> ListingDTO
             CreateMap<Listing, ListingDTO>()
-                .ForMember(d => d.Id, o => o.MapFrom(s => s.ListingId))
+                .ForMember(d => d.ListingId, o => o.MapFrom(s => s.ListingId))
                 .ForMember(d => d.LogoUrl, o => o.MapFrom(s => s.LogoUrl ?? string.Empty))
                 .ForMember(d => d.Address, o => o.MapFrom(s => s.Address ?? string.Empty));
 
@@ -268,14 +268,25 @@ namespace Api.Infrastructure.AutoMapper
 
             // ========== USERS ==========
 
-            // Mapeo de Entidad a DTO
+            // 1. Mapeo para lectura y creación (No lo tocamos para no romper el Crear)
             CreateMap<User, UserDto>()
                 .ForMember(dest => dest.userId, opt => opt.MapFrom(src => src.UserId));
-            // Nota: Si en UserDto la propiedad se llama 'UserId' igual que en la entidad, 
-            // solo necesitas: CreateMap<User, UserDto>();
 
-            // Si necesitas el camino inverso (de DTO a Entidad)
             CreateMap<UserDto, User>();
+
+            // 2. NUEVO: Mapeo específico para actualización (UpdateUserDto -> User)
+            // Esto es lo que necesita tu método UpdateUserAsync
+            CreateMap<UpdateUserDto, User>()
+                .ForMember(dest => dest.UserId, opt => opt.Ignore())       // Protege la PK
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())    // No borra fecha de creación
+                .ForMember(dest => dest.CreatedByUserId, opt => opt.Ignore())
+                .ForMember(dest => dest.ModifiedAt, opt => opt.Ignore())   // Se asigna en el Service
+                .ForMember(dest => dest.ModifiedByUserId, opt => opt.Ignore())
+                // Si el password llega vacío desde el front, no pisa el que ya existe en la DB
+                .ForMember(dest => dest.PasswordHash, opt => opt.Condition(src => !string.IsNullOrEmpty(src.password)));
+
+            // 3. NUEVO: Mapeo inverso para el retorno del Service (User -> UpdateUserDto)
+            CreateMap<User, UpdateUserDto>();
         }
     }
 }

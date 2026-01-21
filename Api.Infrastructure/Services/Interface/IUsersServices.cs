@@ -12,6 +12,6 @@ namespace Api.Infrastructure.Services.Interface
         Task<List<UserDto>> GetAllUserAsync();
         Task<List<UserDto>> GetByUserIdAsync(int userId);
         Task<bool> LoginAsync(Auth_Login login);
-        Task<UpdateUserDto> UpdateUserAsync(int currentUserId, UpdateUserDto updateUserDto);
+        Task<UpdateUserDto> UpdateUserAsync(int userId, UpdateUserDto updateUserDto);
     }
 }
