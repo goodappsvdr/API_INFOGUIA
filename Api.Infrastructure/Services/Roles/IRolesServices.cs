@@ -7,6 +7,9 @@ namespace Api.Infrastructure.Services.Roles
         // CREATE
         Task<RoleDto> CreateAsync(CreateRoleDto dto);
 
+        // UPDATE
+        Task<RoleDto> UpdateAsync(int id, UpdateRoleDto dto);
+
         // READ
         Task<List<RoleDto>> GetAllAsync();
 

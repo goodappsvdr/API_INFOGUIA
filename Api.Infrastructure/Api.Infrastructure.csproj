@@ -19,15 +19,17 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Services\Services\**" />
+	  <EmbeddedResource Remove="Services\Services\**" />
+	  <None Remove="Services\Services\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <PackageReference Include="EPPlus" Version="7.1.2" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\Api.Shared\Api.Shared.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Services\Services\" />
 	</ItemGroup>
 
 </Project>

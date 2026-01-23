@@ -22,7 +22,11 @@ public partial class Context : DbContext
 
     public virtual DbSet<Country> Countries { get; set; }
 
-   public virtual DbSet<Api.Shared.Models.Directory> Directories { get; set; }
+    public virtual DbSet<Api.Shared.Models.Directory> Directories { get; set; }
+
+    public virtual DbSet<DynamicField> DynamicFields { get; set; }
+
+    public virtual DbSet<DynamicModule> DynamicModules { get; set; }
 
     public virtual DbSet<Listing> Listings { get; set; }
 
@@ -105,23 +109,6 @@ public partial class Context : DbContext
             entity.Property(e => e.Name).HasMaxLength(100);
             entity.Property(e => e.ParentCategoryId).HasColumnName("ParentCategoryID");
             entity.Property(e => e.TenantId).HasColumnName("TenantID");
-
-            entity.HasOne(d => d.CreatedByUser).WithMany(p => p.CategoryCreatedByUsers)
-                .HasForeignKey(d => d.CreatedByUserId)
-                .HasConstraintName("FK_Categories_CreatedByUser");
-
-            entity.HasOne(d => d.ModifiedByUser).WithMany(p => p.CategoryModifiedByUsers)
-                .HasForeignKey(d => d.ModifiedByUserId)
-                .HasConstraintName("FK_Categories_ModifiedByUser");
-
-            entity.HasOne(d => d.ParentCategory).WithMany(p => p.InverseParentCategory)
-                .HasForeignKey(d => d.ParentCategoryId)
-                .HasConstraintName("FK_Categories_Self_Parent");
-
-            entity.HasOne(d => d.Tenant).WithMany(p => p.Categories)
-                .HasForeignKey(d => d.TenantId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Categories_Tenants");
         });
 
         modelBuilder.Entity<City>(entity =>
@@ -136,11 +123,6 @@ public partial class Context : DbContext
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.Name).HasMaxLength(100);
             entity.Property(e => e.ProvinceId).HasColumnName("ProvinceID");
-
-            entity.HasOne(d => d.Province).WithMany(p => p.Cities)
-                .HasForeignKey(d => d.ProvinceId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Cities_Provinces");
         });
 
         modelBuilder.Entity<Country>(entity =>
@@ -156,18 +138,50 @@ public partial class Context : DbContext
             entity.Property(e => e.Name).HasMaxLength(100);
         });
 
-        modelBuilder.Entity<Api.Shared.Models.Directory>(entity =>
+
+        modelBuilder.Entity<DynamicField>(entity =>
         {
-            entity.HasKey(e => e.DirectoryId).HasName("PK__Director__3D93EF02310A129E");
+            entity.HasKey(e => e.FieldId).HasName("PK__DynamicF__C8B6FF07E0EDE48D");
 
-            entity.HasIndex(e => e.TenantId, "IX_Directories_TenantID");
+            entity.HasIndex(e => e.DataType, "IX_DynamicFields_DataType");
 
-            entity.Property(e => e.DirectoryId).HasColumnName("DirectoryID");
+            entity.HasIndex(e => e.ModuleId, "IX_DynamicFields_ModuleId");
+
+            entity.HasIndex(e => new { e.ModuleId, e.SortOrder }, "IX_DynamicFields_SortOrder");
+
+            entity.HasIndex(e => new { e.ModuleId, e.ColumnName }, "UK_DynamicFields_ModuleColumn").IsUnique();
+
+            entity.HasIndex(e => new { e.ModuleId, e.FieldName }, "UK_DynamicFields_ModuleField").IsUnique();
+
+            entity.Property(e => e.ColumnName).HasMaxLength(100);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.CreatedByUserId).HasColumnName("CreatedByUserID");
+            entity.Property(e => e.DataType).HasMaxLength(50);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.DisplayName).HasMaxLength(100);
+            entity.Property(e => e.FieldName).HasMaxLength(100);
+            entity.Property(e => e.LookupDisplayColumn).HasMaxLength(100);
+            entity.Property(e => e.LookupKeyColumn).HasMaxLength(100);
+            entity.Property(e => e.LookupTable).HasMaxLength(100);
+            entity.Property(e => e.ShowInForm).HasDefaultValue(true);
+            entity.Property(e => e.ShowInList).HasDefaultValue(true);
+        });
+
+        modelBuilder.Entity<DynamicModule>(entity =>
+        {
+            entity.HasKey(e => e.ModuleId).HasName("PK__DynamicM__2B7477A705426669");
+
+            entity.HasIndex(e => e.IsActive, "IX_DynamicModules_IsActive");
+
+            entity.HasIndex(e => e.EntityName, "UK_DynamicModules_EntityName").IsUnique();
+
+            entity.HasIndex(e => e.TableName, "UK_DynamicModules_TableName").IsUnique();
+
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.EntityName).HasMaxLength(100);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.Name).HasMaxLength(100);
-            entity.Property(e => e.TenantId).HasColumnName("TenantID");
+            entity.Property(e => e.TableName).HasMaxLength(100);
         });
 
         modelBuilder.Entity<Listing>(entity =>
@@ -335,21 +349,14 @@ public partial class Context : DbContext
             entity.Property(e => e.IconUrl).HasMaxLength(512);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.Name).HasMaxLength(100);
-
-            entity.HasOne(d => d.Country).WithMany(p => p.Provinces)
-                .HasForeignKey(d => d.CountryId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Provinces_Countries");
         });
 
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.RoleId).HasName("PK__Roles__8AFACE3A5E3654EA");
-
-            entity.HasIndex(e => e.Name, "UQ__Roles__737584F6B9F64D24").IsUnique();
-
             entity.Property(e => e.RoleId).HasColumnName("RoleID");
-            entity.Property(e => e.Name).HasMaxLength(50);
+            entity.Property(e => e.Name)
+                .HasMaxLength(50)
+                .IsUnicode(false);
         });
 
         modelBuilder.Entity<Service>(entity =>
@@ -408,19 +415,6 @@ public partial class Context : DbContext
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.ModifiedByUserId).HasColumnName("ModifiedByUserID");
             entity.Property(e => e.Name).HasMaxLength(100);
-
-            entity.HasOne(d => d.City).WithMany(p => p.Tenants)
-                .HasForeignKey(d => d.CityId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Tenants_Cities");
-
-            entity.HasOne(d => d.CreatedByUser).WithMany(p => p.TenantCreatedByUsers)
-                .HasForeignKey(d => d.CreatedByUserId)
-                .HasConstraintName("FK_Tenants_CreatedByUser");
-
-            entity.HasOne(d => d.ModifiedByUser).WithMany(p => p.TenantModifiedByUsers)
-                .HasForeignKey(d => d.ModifiedByUserId)
-                .HasConstraintName("FK_Tenants_ModifiedByUser");
         });
 
         modelBuilder.Entity<User>(entity =>
@@ -448,24 +442,6 @@ public partial class Context : DbContext
             entity.Property(e => e.ModifiedByUserId).HasColumnName("ModifiedByUserID");
             entity.Property(e => e.RoleId).HasColumnName("RoleID");
             entity.Property(e => e.TenantId).HasColumnName("TenantID");
-
-            entity.HasOne(d => d.CreatedByUser).WithMany(p => p.InverseCreatedByUser)
-                .HasForeignKey(d => d.CreatedByUserId)
-                .HasConstraintName("FK_Users_CreatedByUser");
-
-            entity.HasOne(d => d.ModifiedByUser).WithMany(p => p.InverseModifiedByUser)
-                .HasForeignKey(d => d.ModifiedByUserId)
-                .HasConstraintName("FK_Users_ModifiedByUser");
-
-            //entity.HasOne(d => d.Role).WithMany(p => p.Users)
-            //    .HasForeignKey(d => d.RoleId)
-            //    .OnDelete(DeleteBehavior.ClientSetNull)
-            //    .HasConstraintName("FK_Users_Roles");
-
-            entity.HasOne(d => d.Tenant).WithMany(p => p.Users)
-                .HasForeignKey(d => d.TenantId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Users_Tenants");
         });
 
         OnModelCreatingPartial(modelBuilder);

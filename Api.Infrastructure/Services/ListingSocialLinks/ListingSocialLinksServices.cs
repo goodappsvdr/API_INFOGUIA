@@ -8,12 +8,12 @@ namespace Api.Infrastructure.Services.ListingSocialLinks
 {
     public class ListingSocialLinksServices : IListingSocialLinksServices
     {
-        private readonly ContextInfoGuia _context;
+        private readonly Context _context;
         private readonly IMapper _mapper;
         private readonly ILogger<ListingSocialLinksServices> _logger;
 
         public ListingSocialLinksServices(
-            ContextInfoGuia context,
+            Context context,
             IMapper mapper,
             ILogger<ListingSocialLinksServices> logger)
         {
@@ -69,7 +69,7 @@ namespace Api.Infrastructure.Services.ListingSocialLinks
             var links = await _context.ListingSocialLinks
                 .AsNoTracking()
                 .Where(x => x.ListingId == listingId && x.IsActive)
-                .OrderBy(x => x.SortOrder)
+                .OrderByDescending(x => x.ListingSocialLinkId)
                 .ToListAsync();
 
             return _mapper.Map<List<ListingSocialLinksDto>>(links);

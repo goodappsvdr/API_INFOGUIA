@@ -10,12 +10,12 @@ namespace Api.Infrastructure.Services.ListingHoursServices
 {
     public class ListingHoursServices : IListingHoursServices
     {
-        private readonly ContextInfoGuia _context;
+        private readonly Context _context;
         private readonly IMapper _mapper;
         private readonly ILogger<ListingHoursServices> _logger;
 
         public ListingHoursServices(
-            ContextInfoGuia context,
+            Context context,
             IMapper mapper,
             ILogger<ListingHoursServices> logger)
         {
@@ -30,7 +30,7 @@ namespace Api.Infrastructure.Services.ListingHoursServices
             {
                 var hours = await _context.ListingHours
                     .AsNoTracking()
-                    .OrderBy(x => x.ListingId)
+                    .OrderByDescending(x => x.ListingId)
                     .ThenBy(x => x.DayOfWeek)
                     .ThenBy(x => x.OpenTime)
                     .ToListAsync();

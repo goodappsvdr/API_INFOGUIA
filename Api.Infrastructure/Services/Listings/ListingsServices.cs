@@ -11,14 +11,14 @@ namespace Api.Infrastructure.Services.Listings
 {
     public class ListingsServices : IListingsServices
     {
-        private readonly ContextInfoGuia _context;
+        private readonly Context _context;
         private readonly IMapper _mapper;
         private readonly ILogger<ListingsServices> _logger;
         private readonly IUsersServices _userServices; // 1. Inyectar el servicio de usuario
         private readonly IHttpContextAccessor _httpContext; // 2. Para obtener el username del token
 
         public ListingsServices(
-            ContextInfoGuia context,
+            Context context,
             IMapper mapper,
             ILogger<ListingsServices> logger,
             IUsersServices userServices,
@@ -37,7 +37,7 @@ namespace Api.Infrastructure.Services.Listings
             {
                 var listings = await _context.Listings
                     .AsNoTracking()
-                    .OrderByDescending(l => l.CreatedAt)
+                    .OrderByDescending(l => l.ListingId)
                     .ToListAsync();
 
                 return _mapper.Map<List<ListingDTO>>(listings);

@@ -17,12 +17,12 @@ namespace Api.Infrastructure.Services
 {
 	public class UsersServices : IUsersServices
 	{
-		private readonly ContextInfoGuia _context;
+		private readonly Context _context;
 		private readonly IMapper _mapper;
         private readonly ILogger<UsersServices> _logger;
 
         public UsersServices(
-            ContextInfoGuia context,
+            Context context,
             IMapper mapper,
             ILogger<UsersServices> logger)
         {
@@ -57,7 +57,8 @@ namespace Api.Infrastructure.Services
                 {
                     User = u,
                     RoleName = r.Name,
-                    RoleId = r.RoleId
+                    RoleId = r.RoleId,
+                     ImgProfile = u.ImgProfile
                 }
             ).FirstOrDefaultAsync();
 
@@ -73,7 +74,9 @@ namespace Api.Infrastructure.Services
                 TenantId = data.User.TenantId,
                 RoleId = data.RoleId,
                 RoleName = data.RoleName,
-                Status = data.User.IsActive ? "Activo" : "Inactivo"
+                Status = data.User.IsActive ? "Activo" : "Inactivo",
+                ImgProfile = data.ImgProfile
+
             };
 
             claim.BranchOffices = await (
@@ -83,7 +86,7 @@ namespace Api.Infrastructure.Services
                 where us.UserId == data.User.UserId
                 select new Jwt_Claims_BracnhOffice
                 {
-                    BranchId = bo.BranchOfficeId ?? 0,
+                    BranchId = bo.BranchOfficeId,
                     Description = bo.Name,
                     PointSale = bo.SalesPoint
                 }
@@ -91,28 +94,45 @@ namespace Api.Infrastructure.Services
 
             return claim;
         }
-
-
-        /// <summary>
-        /// Buscar todos los usuarios
-        /// </summary>
-        public async Task<List<UserDto>> GetAllUserAsync()
+        public async Task<List<GetUsers>> GetAllUserAsync()
         {
             try
             {
-                var users = await _context.Users
-                    .AsNoTracking()
-                    .OrderBy(c => c.UserId)
-                    .ToListAsync();
+                var users = await (
+                    from u in _context.Users.AsNoTracking()
+                    join r in _context.Roles.AsNoTracking()
+                        on u.RoleId equals r.RoleId
+                    select new GetUsers
+                    {
+                        UserId = u.UserId,
+                        TenantId = u.TenantId,
+                        RoleId = u.RoleId,
 
-                return _mapper.Map<List<UserDto>>(users);
+                        Email = u.Email,
+                        FirstName = u.FirstName,
+                        LastName = u.LastName,
+                        ImgProfile = u.ImgProfile,
+
+                        IsActive = u.IsActive,
+
+                        CreatedAt = u.CreatedAt,
+                        CreatedByUserId = u.CreatedByUserId ?? 0,
+                        ModifiedAt = u.ModifiedAt ?? DateTime.Now,
+                        ModifiedByUserId = u.ModifiedByUserId ?? 0,
+                        Rol = r.Name
+                    }
+                ).OrderByDescending(x => x.UserId)
+                .ToListAsync();
+
+                return users;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error retrieving all categories");
+                _logger.LogError(ex, "Error retrieving all users");
                 throw;
             }
         }
+
 
 
         /// <summary>

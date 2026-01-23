@@ -227,13 +227,14 @@ namespace Api.Infrastructure.AutoMapper
 
             // ========== ROLES ==========
 
-
             // CreateRoleDto -> Role (entidad)
             CreateMap<CreateRoleDto, Role>()
                 .ForMember(d => d.RoleId, o => o.Ignore()); // El ID se genera automáticamente
 
             // Role (entidad) -> RoleDto
             CreateMap<Role, RoleDto>();
+
+            CreateMap<UpdateRoleDto, Role>();
 
 
             // ========== CATEGORIES ==========

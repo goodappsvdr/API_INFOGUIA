@@ -30,24 +30,4 @@ public partial class User
     public DateTime? ModifiedAt { get; set; }
 
     public int? ModifiedByUserId { get; set; }
-
-    public virtual ICollection<Category> CategoryCreatedByUsers { get; set; } = new List<Category>();
-
-    public virtual ICollection<Category> CategoryModifiedByUsers { get; set; } = new List<Category>();
-
-    public virtual User? CreatedByUser { get; set; }
-
-    public virtual ICollection<User> InverseCreatedByUser { get; set; } = new List<User>();
-
-    public virtual ICollection<User> InverseModifiedByUser { get; set; } = new List<User>();
-
-    public virtual User? ModifiedByUser { get; set; }
-
-    public virtual Role Role { get; set; } = null!;
-
-    public virtual Tenant Tenant { get; set; } = null!;
-
-    public virtual ICollection<Tenant> TenantCreatedByUsers { get; set; } = new List<Tenant>();
-
-    public virtual ICollection<Tenant> TenantModifiedByUsers { get; set; } = new List<Tenant>();
 }

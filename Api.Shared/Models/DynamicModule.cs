@@ -3,19 +3,17 @@ using System.Collections.Generic;
 
 namespace Api.Shared.Models;
 
-public partial class Category
+public partial class DynamicModule
 {
-    public int CategoryId { get; set; }
-
-    public int TenantId { get; set; }
-
-    public int? ParentCategoryId { get; set; }
+    public int ModuleId { get; set; }
 
     public string Name { get; set; } = null!;
 
-    public string? IconUrl { get; set; }
+    public string TableName { get; set; } = null!;
 
-    public int SortOrder { get; set; }
+    public string EntityName { get; set; } = null!;
+
+    public string? Description { get; set; }
 
     public bool IsActive { get; set; }
 

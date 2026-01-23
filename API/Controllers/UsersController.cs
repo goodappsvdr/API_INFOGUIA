@@ -22,7 +22,7 @@ namespace Api.Controllers
     [ApiController, AllowAnonymous, Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
-        private readonly ContextInfoGuia _context;
+        private readonly Context _context;
         private readonly IUsersServices _usersServices;
         private readonly Jwt_AccessTokenSettings _accessTokenSettings;
         private readonly Jwt_RefreshTokenSettings _refreshTokenSettings;
@@ -38,7 +38,7 @@ namespace Api.Controllers
         IUsersServices usersServices,
         Jwt_AccessTokenSettings accessTokenSettings,
         Jwt_RefreshTokenSettings refreshTokenSettings,
-        ContextInfoGuia context,
+        Context context,
          ILogger<ListingsController> logger)
 
         {
@@ -212,19 +212,17 @@ namespace Api.Controllers
                 "198608702380-0p9in3tfc6n2qsucfs4guj3ccu318qv4.apps.googleusercontent.com"
             }
                 };
-
                 var payload = await GoogleJsonWebSignature.ValidateAsync(
                     input.IdToken,
                     settings
                 );
-
                 string email = payload.Email;
-
                 var user = await _context.Users
                     .FirstOrDefaultAsync(x => x.Email == email);
 
                 if (user == null)
                 {
+                    // Crear nuevo usuario
                     user = new User
                     {
                         TenantId = 1,
@@ -240,26 +238,33 @@ namespace Api.Controllers
                         ModifiedAt = DateTime.UtcNow,
                         ModifiedByUserId = 0
                     };
-
                     _context.Users.Add(user);
                     await _context.SaveChangesAsync();
-
                     user.CreatedByUserId = user.UserId;
                     user.ModifiedByUserId = user.UserId;
                     await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    // Usuario ya existe - actualizar imagen si cambió
+                    if (user.ImgProfile != payload.Picture)
+                    {
+                        user.ImgProfile = payload.Picture;
+                        user.ModifiedAt = DateTime.UtcNow;
+                        user.ModifiedByUserId = user.UserId;
+                        await _context.SaveChangesAsync();
+                    }
                 }
 
                 if (!user.IsActive)
                     return Unauthorized("Usuario inactivo");
 
                 var claims = await _usersServices.GetClaimsAsync(user.Email);
-
                 var tokens = Jwt_Helpers.GetAccessTokens(
                     new Jwt_Tokens(),
                     claims,
                     _accessTokenSettings
                 );
-
                 return Ok(tokens);
             }
             catch (Exception ex)

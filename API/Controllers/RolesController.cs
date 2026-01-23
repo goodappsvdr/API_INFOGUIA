@@ -107,5 +107,40 @@ namespace API.Controllers
             }
 
         }
+
+        /// <summary>
+        /// Actualiza un rol existente
+        /// </summary>
+        [HttpPut("UpdateRole/{id}")]
+        [ProducesResponseType(typeof(ApiResponse<RoleDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateRoleDto dto)
+        {
+            if (dto == null)
+                return BadRequest(ApiResponse<object>.ErrorResponse("Datos inválidos"));
+
+            try
+            {
+                var updated = await _roleService.UpdateAsync(id, dto);
+
+                return Ok(ApiResponse<RoleDto>.SuccessResponse(updated, "Role updated successfully"));
+            }
+            catch (BadRequestException ex)
+            {
+                return BadRequest(ApiResponse<object>.ErrorResponse(ex.Message));
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ApiResponse<object>.ErrorResponse(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error al actualizar rol");
+                return StatusCode(500, ApiResponse<object>.ErrorResponse(ex.InnerException?.Message ?? ex.Message));
+            }
+        }
+
+
     }
 }

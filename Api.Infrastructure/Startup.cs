@@ -62,7 +62,7 @@ public static class Startup
     internal static IServiceCollection AddSqlConnection(this IServiceCollection services, IConfiguration config)
     {
         var connectionString = config.GetConnectionString("SQL");
-        services.AddDbContext<ContextInfoGuia>(options => options.UseSqlServer(connectionString));
+        services.AddDbContext<Context>(options => options.UseSqlServer(connectionString));
         return services;
     }
     internal static IServiceCollection AddCorsSettings(this IServiceCollection services)
