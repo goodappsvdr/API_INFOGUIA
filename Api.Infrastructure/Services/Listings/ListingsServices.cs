@@ -193,6 +193,16 @@ namespace Api.Infrastructure.Services.Listings
 
                 _logger.LogInformation("Listing {ListingId} created by user {UserId}", listing.ListingId, userId);
 
+                // Agrego la relacion entre usuarios y listing
+
+                _context.ListingUsers.Add(new ListingUser
+                {
+                    ListingId = listing.ListingId,
+                    UserId = Convert.ToInt32(userId)
+                });
+
+                await _context.SaveChangesAsync();
+
                 return _mapper.Map<ListingDTO>(listing);
             }
             catch (Exception ex)

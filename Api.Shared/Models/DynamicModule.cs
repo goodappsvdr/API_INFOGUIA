@@ -24,4 +24,6 @@ public partial class DynamicModule
     public DateTime? ModifiedAt { get; set; }
 
     public int? ModifiedByUserId { get; set; }
+
+    public virtual ICollection<DynamicField> DynamicFields { get; set; } = new List<DynamicField>();
 }

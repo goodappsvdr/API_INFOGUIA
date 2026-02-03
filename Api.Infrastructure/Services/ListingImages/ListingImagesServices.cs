@@ -16,6 +16,7 @@ namespace Api.Infrastructure.Services.ListingImagesServices
 
         public ListingImagesServices(
             Context context,
+
             IMapper mapper,
             ILogger<ListingImagesServices> logger)
         {

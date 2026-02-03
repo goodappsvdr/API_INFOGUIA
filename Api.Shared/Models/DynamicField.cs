@@ -56,4 +56,6 @@ public partial class DynamicField
     public DateTime? ModifiedAt { get; set; }
 
     public int? ModifiedByUserId { get; set; }
+
+    public virtual DynamicModule Module { get; set; } = null!;
 }

@@ -21,11 +21,8 @@ namespace Api.Infrastructure.Services
 		private readonly IMapper _mapper;
         private readonly ILogger<UsersServices> _logger;
 
-        public UsersServices(
-            Context context,
-            IMapper mapper,
-            ILogger<UsersServices> logger)
-        {
+		public UsersServices(Context context, IMapper mapper)
+		{
 			_context = context;
 			_mapper = mapper;
             _logger = logger;
@@ -87,6 +84,8 @@ namespace Api.Infrastructure.Services
                 select new Jwt_Claims_BracnhOffice
                 {
                     BranchId = bo.BranchOfficeId,
+
+
                     Description = bo.Name,
                     PointSale = bo.SalesPoint
                 }

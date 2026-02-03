@@ -1,4 +1,8 @@
-﻿using Api.Infrastructure.Services.Categories;
+﻿using Api.Infrastructure.Mapping;
+using Api.Infrastructure.Services.Categories;
+using Api.Infrastructure.Services.Dynamic;
+
+//using Api.Infrastructure.Services.Dynamic;
 using Api.Infrastructure.Services.Listings;
 using Api.Infrastructure.Services.Roles;
 using Api.Shared.Data;
@@ -83,11 +87,20 @@ public static class Startup
     }
     internal static IServiceCollection AddServicesSettings(this IServiceCollection services)
     {
+        // Servicios existentes
         services.AddTransient<IUsersServices, UsersServices>();
         services.AddTransient<IListingsServices, ListingsServices>();
         services.AddTransient<ICategorieServices, CategorieServices>();
         services.AddTransient<IRolesServices, RolesServices>();
 
+        // ✅ AGREGAR: Servicios del sistema dinámico ABM
+        services.AddScoped<IDynamicModuleService, DynamicModuleService>();
+        services.AddScoped<IDynamicEntityService, DynamicEntityService>();
+        services.AddScoped<IDynamicDatabaseService, DynamicDatabaseService>();
+        services.AddScoped<IDynamicMappingService, DynamicMappingService>();
+
+        // ✅ AGREGAR: AutoMapper profile si no lo tienes ya registrado
+        services.AddAutoMapper(typeof(DynamicModuleProfile));
 
         return services;
     }

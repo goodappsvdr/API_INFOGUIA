@@ -22,6 +22,14 @@
 	  <Compile Remove="Services\Services\**" />
 	  <EmbeddedResource Remove="Services\Services\**" />
 	  <None Remove="Services\Services\**" />
+
+	  <Compile Remove="Configuration\**" />
+	  <EmbeddedResource Remove="Configuration\**" />
+	  <None Remove="Configuration\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="EPPlus" Version="7.1.2" />
 	</ItemGroup>
 
 	<ItemGroup>
