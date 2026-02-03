@@ -1,4 +1,9 @@
+<<<<<<< Pablo_develop
 ﻿using Api.Infrastructure.Services.Categories;
+=======
+﻿
+using Api.Infrastructure.Services.Categories;
+>>>>>>> master
 
 using Api.Infrastructure.Services.Listings;
 using Api.Infrastructure.Services.ListingImages;
@@ -93,7 +98,14 @@ public static class Startup
         services.AddTransient<ICategorieServices, CategorieServices>();
         services.AddTransient<IRolesServices, RolesServices>();
 
+<<<<<<< Pablo_develop
     
+=======
+
+
+
+
+>>>>>>> master
         return services;
     }
 

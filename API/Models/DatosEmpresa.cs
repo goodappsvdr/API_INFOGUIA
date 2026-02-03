@@ -17,7 +17,8 @@ public partial class DatosEmpresa
 
     public DateTime FechaInicio { get; set; }
 
-    public string DireccionComercial { get; set; } = null!;
+    public string 
+        ccionComercial { get; set; } = null!;
 
     public int IdProvincia { get; set; }
 

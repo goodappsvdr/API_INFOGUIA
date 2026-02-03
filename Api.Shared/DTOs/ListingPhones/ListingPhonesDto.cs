@@ -18,6 +18,14 @@
         public string PhoneNumber { get; set; } = null!;
         public int SortOrder { get; set; }
     }
+    public class AddListingPhonesCompleteDTO
+    {
+   
+        public string PhoneType { get; set; } = null!;
+        public string PhoneNumber { get; set; } = null!;
+        public int SortOrder { get; set; }
+    }
+
 
     public class UpdateListingPhonesDTO
     {

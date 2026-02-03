@@ -65,6 +65,38 @@ namespace API.Controllers
         }
 
         /// <summary>
+        /// Creates a new listing with complete details
+        /// </summary>
+        
+        [HttpPost("complete")]
+        [ProducesResponseType(typeof(ApiResponse<ListingDTO>), StatusCodes.Status201Created)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> CreateListingComplete([FromBody] AddListingCompleteDTO listingDto)
+        {
+            try
+            {
+                var userId = int.Parse(HttpContext.GetUserId());
+                var createdListing = await _listingsServices.CreateListingCompleteAsync(userId, listingDto);
+                return CreatedAtAction(
+                    nameof(GetListingById),
+                    new { id = createdListing.UserId },
+                    ApiResponse<ListingDTO>.SuccessResponse(createdListing, "Listing created successfully")
+                );
+            }
+            catch (BadRequestException ex)
+            {
+                _logger.LogWarning(ex, "Bad request while creating complete listing");
+                return BadRequest(ApiResponse<object>.ErrorResponse(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error creating complete listing");
+                return StatusCode(500, ApiResponse<object>.ErrorResponse("An error occurred while creating the listing"));
+            }
+        }
+
+
+        /// <summary>
         /// Gets all listings
         /// </summary>
         /// <returns>Listings with total count</returns>
@@ -103,14 +135,14 @@ namespace API.Controllers
         /// <response code="404">Listing not found</response>
         /// <response code="401">Unauthorized</response>
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(ApiResponse<ListingDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<GetAllListing>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetListingById(int id)
         {
             try
             {
                 var listing = await _listingsServices.GetListingByIdAsync(id);
-                return Ok(ApiResponse<ListingDTO>.SuccessResponse(listing));
+                return Ok(ApiResponse<GetAllListing>.SuccessResponse(listing));
             }
             catch (NotFoundException ex)
             {
