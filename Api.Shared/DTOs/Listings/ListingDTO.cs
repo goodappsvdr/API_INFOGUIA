@@ -85,6 +85,7 @@ namespace Api.Shared.DTOs.Listings
 
     }
 
+
     public class UpdateListingDTO 
     {
         public int Id { get; set; }
@@ -111,6 +112,75 @@ namespace Api.Shared.DTOs.Listings
     {
         public int TotalCount { get; set; }
         public List<GetAllListingBy> Items { get; set; }
+    }
+    public class AddListingCompleteDTO
+    {
+
+        public int TenantId { get; set; }
+
+        public int CategoryId { get; set; }
+
+        public int CityId { get; set; }
+
+        public string Name { get; set; } = null!;
+
+        public string? ShortDescription { get; set; }
+
+        public string? LongDescription { get; set; }
+
+        public string? LogoUrl { get; set; }
+
+        public string? Address { get; set; }
+
+        public decimal? Latitude { get; set; }
+
+        public decimal? Longitude { get; set; }
+
+        public string? Email { get; set; }
+
+        public string? WebsiteUrl { get; set; }
+
+        public string? VideoUrl { get; set; }
+
+        public string? CatalogUrl { get; set; }
+
+        public int SortOrder { get; set; }
+        public bool IsActive { get; set; }
+        public int UserId { get; set; }
+
+        public List<AddListingServicesComleteDTO> Services { get; set; }
+        public List<AddListingHoursCompleteDTO> Hours { get; set; }
+        public List<AddListingSocialLinksCompleteDTO> socialLinks { get; set; }
+        public List<AddListingPhonesCompleteDTO> phones { get; set; }
+
+
+    }
+
+    public class UpdateListingCompleteDTO
+    {
+        public int Id { get; set; }
+        public int CategoryId { get; set; }
+        public int CityId { get; set; }
+        public string Name { get; set; } = null!;
+        public string? ShortDescription { get; set; }
+        public string? LongDescription { get; set; }
+        public string? LogoUrl { get; set; }
+        public string? Address { get; set; }
+        public decimal? Latitude { get; set; }
+        public decimal? Longitude { get; set; }
+        public string? Email { get; set; }
+        public string? WebsiteUrl { get; set; }
+        public string? VideoUrl { get; set; }
+        public string? CatalogUrl { get; set; }
+        public int SortOrder { get; set; }
+        public bool IsActive { get; set; }
+        public int UserId { get; set; }
+
+        public List<ListingServices> Services { get; set; }
+        public List<AddListingHoursCompleteDTO> Hours { get; set; }
+        public List<AddListingSocialLinksCompleteDTO> socialLinks { get; set; }
+        public List<AddListingPhonesCompleteDTO> phones { get; set; }
+
     }
 
     public class GetAllListingBy
