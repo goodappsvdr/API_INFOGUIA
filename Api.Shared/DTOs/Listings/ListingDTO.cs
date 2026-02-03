@@ -148,7 +148,7 @@ namespace Api.Shared.DTOs.Listings
         public bool IsActive { get; set; }
         public int UserId { get; set; }
 
-        public List<AddListingServicesComleteDTO> Services { get; set; }
+        public List<AddListingServicesCompleteDTO> Services { get; set; }
         public List<AddListingHoursCompleteDTO> Hours { get; set; }
         public List<AddListingSocialLinksCompleteDTO> socialLinks { get; set; }
         public List<AddListingPhonesCompleteDTO> phones { get; set; }
@@ -176,7 +176,7 @@ namespace Api.Shared.DTOs.Listings
         public bool IsActive { get; set; }
         public int UserId { get; set; }
 
-        public List<ListingServices> Services { get; set; }
+        public List<AddListingServicesCompleteDTO> Services { get; set; }
         public List<AddListingHoursCompleteDTO> Hours { get; set; }
         public List<AddListingSocialLinksCompleteDTO> socialLinks { get; set; }
         public List<AddListingPhonesCompleteDTO> phones { get; set; }

@@ -22,11 +22,7 @@ public partial class Context : DbContext
 
     public virtual DbSet<Country> Countries { get; set; }
 
-    public virtual DbSet<Api.Shared.Models.Directory> Directories { get; set; }
 
-    public virtual DbSet<DynamicField> DynamicFields { get; set; }
-
-    public virtual DbSet<DynamicModule> DynamicModules { get; set; }
 
     public virtual DbSet<Listing> Listings { get; set; }
 
@@ -139,100 +135,10 @@ public partial class Context : DbContext
         });
 
 
-        modelBuilder.Entity<DynamicField>(entity =>
-        {
-            entity.HasKey(e => e.FieldId).HasName("PK__DynamicF__C8B6FF07E0EDE48D");
 
-            entity.HasIndex(e => e.DataType, "IX_DynamicFields_DataType");
+     
 
-            entity.HasIndex(e => e.ModuleId, "IX_DynamicFields_ModuleId");
-
-            entity.HasIndex(e => new { e.ModuleId, e.SortOrder }, "IX_DynamicFields_SortOrder");
-
-            entity.HasIndex(e => new { e.ModuleId, e.ColumnName }, "UK_DynamicFields_ModuleColumn").IsUnique();
-
-            entity.HasIndex(e => new { e.ModuleId, e.FieldName }, "UK_DynamicFields_ModuleField").IsUnique();
-
-            entity.Property(e => e.ColumnName).HasMaxLength(100);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.DataType).HasMaxLength(50);
-            entity.Property(e => e.Description).HasMaxLength(500);
-            entity.Property(e => e.DisplayName).HasMaxLength(100);
-            entity.Property(e => e.FieldName).HasMaxLength(100);
-            entity.Property(e => e.LookupDisplayColumn).HasMaxLength(100);
-            entity.Property(e => e.LookupKeyColumn).HasMaxLength(100);
-            entity.Property(e => e.LookupTable).HasMaxLength(100);
-            entity.Property(e => e.ShowInForm).HasDefaultValue(true);
-            entity.Property(e => e.ShowInList).HasDefaultValue(true);
-        });
-
-        modelBuilder.Entity<DynamicModule>(entity =>
-        {
-            entity.HasKey(e => e.ModuleId).HasName("PK__DynamicM__2B7477A705426669");
-
-            entity.HasIndex(e => e.IsActive, "IX_DynamicModules_IsActive");
-
-            entity.HasIndex(e => e.EntityName, "UK_DynamicModules_EntityName").IsUnique();
-
-            entity.HasIndex(e => e.TableName, "UK_DynamicModules_TableName").IsUnique();
-
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.Description).HasMaxLength(500);
-            entity.Property(e => e.EntityName).HasMaxLength(100);
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
-            entity.Property(e => e.Name).HasMaxLength(100);
-            entity.Property(e => e.TableName).HasMaxLength(100);
-        });
-
-        modelBuilder.Entity<DynamicField>(entity =>
-        {
-            entity.HasKey(e => e.FieldId).HasName("PK__DynamicF__C8B6FF07E0EDE48D");
-
-            entity.HasIndex(e => e.DataType, "IX_DynamicFields_DataType");
-
-            entity.HasIndex(e => e.ModuleId, "IX_DynamicFields_ModuleId");
-
-            entity.HasIndex(e => new { e.ModuleId, e.SortOrder }, "IX_DynamicFields_SortOrder");
-
-            entity.HasIndex(e => new { e.ModuleId, e.ColumnName }, "UK_DynamicFields_ModuleColumn").IsUnique();
-
-            entity.HasIndex(e => new { e.ModuleId, e.FieldName }, "UK_DynamicFields_ModuleField").IsUnique();
-
-            entity.Property(e => e.ColumnName).HasMaxLength(100);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.DataType).HasMaxLength(50);
-            entity.Property(e => e.Description).HasMaxLength(500);
-            entity.Property(e => e.DisplayName).HasMaxLength(100);
-            entity.Property(e => e.FieldName).HasMaxLength(100);
-            entity.Property(e => e.LookupDisplayColumn).HasMaxLength(100);
-            entity.Property(e => e.LookupKeyColumn).HasMaxLength(100);
-            entity.Property(e => e.LookupTable).HasMaxLength(100);
-            entity.Property(e => e.ShowInForm).HasDefaultValue(true);
-            entity.Property(e => e.ShowInList).HasDefaultValue(true);
-
-            entity.HasOne(d => d.Module).WithMany(p => p.DynamicFields)
-                .HasForeignKey(d => d.ModuleId)
-                .HasConstraintName("FK_DynamicFields_Module");
-        });
-
-        modelBuilder.Entity<DynamicModule>(entity =>
-        {
-            entity.HasKey(e => e.ModuleId).HasName("PK__DynamicM__2B7477A705426669");
-
-            entity.HasIndex(e => e.IsActive, "IX_DynamicModules_IsActive");
-
-            entity.HasIndex(e => e.EntityName, "UK_DynamicModules_EntityName").IsUnique();
-
-            entity.HasIndex(e => e.TableName, "UK_DynamicModules_TableName").IsUnique();
-
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(getutcdate())");
-            entity.Property(e => e.Description).HasMaxLength(500);
-            entity.Property(e => e.EntityName).HasMaxLength(100);
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
-            entity.Property(e => e.Name).HasMaxLength(100);
-            entity.Property(e => e.TableName).HasMaxLength(100);
-        });
-
+     
         modelBuilder.Entity<Listing>(entity =>
         {
             entity.HasKey(e => e.ListingId).HasName("PK__Listings__BF3EBEF015E53387");
