@@ -384,7 +384,7 @@ namespace Api.Controllers
 
                 return Ok(ApiResponse<UpdateUserDto>.SuccessResponse(updatedUser, "Usuario actualizado correctamente."));
             }
-            catch (NotFoundException ex)
+            catch (Infrastructure.Exceptions.NotFoundException ex)
             {
                 _logger.LogWarning(ex, "Usuario no encontrado: {UserId}", id);
                 return NotFound(ApiResponse<object>.ErrorResponse(ex.Message));
@@ -394,7 +394,7 @@ namespace Api.Controllers
                 _logger.LogWarning(ex, "No autorizado para actualizar usuario: {UserId}", id);
                 return StatusCode(403, ApiResponse<object>.ErrorResponse(ex.Message));
             }
-            catch (BadRequestException ex)
+            catch (Infrastructure.Exceptions.BadRequestException ex)
             {
                 _logger.LogWarning(ex, "Petición incorrecta al actualizar usuario: {UserId}", id);
                 return BadRequest(ApiResponse<object>.ErrorResponse(ex.Message));

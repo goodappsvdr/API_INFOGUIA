@@ -15,20 +15,23 @@ using Api.Shared.DTOs.Listings;
 
 namespace Api.Infrastructure.Services
 {
-	public class UsersServices : IUsersServices
-	{
-		private readonly Context _context;
-		private readonly IMapper _mapper;
+    public class UsersServices : IUsersServices
+    {
+        private readonly Context _context;
+        private readonly IMapper _mapper;
         private readonly ILogger<UsersServices> _logger;
 
-		public UsersServices(Context context, IMapper mapper)
-		{
-			_context = context;
-			_mapper = mapper;
+        public UsersServices(
+            Context context,
+            IMapper mapper,
+            ILogger<UsersServices> logger)
+        {
+            _context = context;
+            _mapper = mapper;
             _logger = logger;
         }
 
-         
+
         public async Task<bool> LoginAsync(Auth_Login login)
         {
             var user = await _context.Users
