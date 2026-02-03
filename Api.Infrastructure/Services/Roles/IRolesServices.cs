@@ -7,12 +7,14 @@ namespace Api.Infrastructure.Services.Roles
         // CREATE
         Task<RoleDto> CreateAsync(CreateRoleDto dto);
 
-        // READ
-        Task<List<RoleDto>> GetAllAsync();
-        Task<RoleDto> GetByIdAsync(int id);
-
         // UPDATE
         Task<RoleDto> UpdateAsync(int id, UpdateRoleDto dto);
+
+        // READ
+        Task<List<RoleDto>> GetAllAsync();
+
+        // CAMBIO AQUÍ: De Task<List<RoleDto>> a Task<RoleDto>
+        Task<RoleDto> GetByIdAsync(int roleId);
 
         // DELETE
         Task DeleteAsync(int id);

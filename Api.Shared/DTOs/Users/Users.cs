@@ -12,4 +12,13 @@ namespace Api.Shared.DTOs.Users
         public string? password { get; set; }
 
     }
+    public class createUserSuperAdmin_Input
+    {
+        public string? email { get; set; }
+        public string? password { get; set; }
+        public int? roleId { get; set; }
+        public string? firstName { get; set; }
+        public int? userId { get; set; }
+
+    }
 }

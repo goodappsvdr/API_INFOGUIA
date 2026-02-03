@@ -15,10 +15,7 @@ namespace Api.Shared.DTOs.ListingSocialLinks
         public int SortOrder { get; set; }
         public bool IsActive { get; set; }
     }
-}
 
-namespace Api.Shared.DTOs.ListingSocialLinks
-{
     public class AddListingSocialLinksDTO
     {
         public int ListingId { get; set; }
@@ -26,10 +23,14 @@ namespace Api.Shared.DTOs.ListingSocialLinks
         public string ProfileUrl { get; set; } = null!;
         public int SortOrder { get; set; }
     }
-}
+    public class AddListingSocialLinksCompleteDTO
+    {
 
-namespace Api.Shared.DTOs.ListingSocialLinks
-{
+        public string NetworkName { get; set; } = null!;
+        public string ProfileUrl { get; set; } = null!;
+        public int SortOrder { get; set; }
+    }
+
     public class UpdateListingSocialLinksDTO
     {
         public int Id { get; set; }               // ListingSocialLinkId
@@ -38,4 +39,13 @@ namespace Api.Shared.DTOs.ListingSocialLinks
         public int SortOrder { get; set; }
         public bool IsActive { get; set; }
     }
+
+    public class GetListingSocialLinks
+    {
+        public int ListingSocialLinkID { get; set; }
+        public string NetworkName { get; set; } = null!;
+        public string? ProfileUrl { get; set; }
+    }
+
+
 }

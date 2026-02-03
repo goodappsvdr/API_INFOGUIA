@@ -26,14 +26,4 @@ public partial class Category
     public DateTime? ModifiedAt { get; set; }
 
     public int? ModifiedByUserId { get; set; }
-
-    public virtual User? CreatedByUser { get; set; }
-
-    public virtual ICollection<Category> InverseParentCategory { get; set; } = new List<Category>();
-
-    public virtual User? ModifiedByUser { get; set; }
-
-    public virtual Category? ParentCategory { get; set; }
-
-    public virtual Tenant Tenant { get; set; } = null!;
 }

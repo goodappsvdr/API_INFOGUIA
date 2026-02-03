@@ -21,6 +21,16 @@
         public DateTime? ValidFrom { get; set; }
         public DateTime? ValidUntil { get; set; }
     }
+    public class AddListingHoursCompleteDTO
+    {
+ 
+        public int DayOfWeek { get; set; }
+        public TimeSpan OpenTime { get; set; }
+        public TimeSpan CloseTime { get; set; }
+        public DateTime? ValidFrom { get; set; }
+        public DateTime? ValidUntil { get; set; }
+    }
+
 
     public class UpdateListingHoursDTO
     {
@@ -32,4 +42,12 @@
         public DateTime? ValidUntil { get; set; }
         public bool IsActive { get; set; }
     }
+
+    public class GetListingHours
+    {
+        public int DayOfWeek { get; set; }
+        public string OpenTime { get; set; }
+        public string CloseTime { get; set; }
+    }
+
 }

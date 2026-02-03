@@ -26,4 +26,12 @@
         public int SortOrder { get; set; }
         public bool IsActive { get; set; }
     }
+
+    public class GetListingImages
+    {
+        public int ListingImageID { get; set; }
+        public string ImageUrl { get; set; } = null!;
+        public string? Caption { get; set; }
+    }
+
 }

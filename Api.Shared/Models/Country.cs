@@ -16,6 +16,4 @@ public partial class Country
     public bool IsActive { get; set; }
 
     public DateTime CreatedAt { get; set; }
-
-    public virtual ICollection<Province> Provinces { get; set; } = new List<Province>();
 }

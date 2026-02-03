@@ -8,12 +8,12 @@ namespace Api.Infrastructure.Services.ListingServices
 {
     public class ListingServicesService : IListingServicesService
     {
-        private readonly ContextInfoGuia _context;
+        private readonly Context _context;
         private readonly IMapper _mapper;
         private readonly ILogger<ListingServicesService> _logger;
 
         public ListingServicesService(
-            ContextInfoGuia context,
+            Context context,
             IMapper mapper,
             ILogger<ListingServicesService> logger)
         {
@@ -74,7 +74,7 @@ namespace Api.Infrastructure.Services.ListingServices
             var services = await _context.ListingServices
                 .AsNoTracking()
                 .Where(x => x.ListingId == listingId)
-                .OrderBy(x => x.ServiceId)
+                .OrderByDescending(x => x.ListingId)
                 .ToListAsync();
 
             return _mapper.Map<List<ListingServicesDto>>(services);

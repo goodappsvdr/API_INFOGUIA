@@ -10,12 +10,12 @@ namespace Api.Infrastructure.Services.ListingPaymentMethodsServices
 {
     public class ListingPaymentMethodsServices : IListingPaymentMethodsServices
     {
-        private readonly ContextInfoGuia _context;
+        private readonly Context _context;
         private readonly IMapper _mapper;
         private readonly ILogger<ListingPaymentMethodsServices> _logger;
 
         public ListingPaymentMethodsServices(
-            ContextInfoGuia context,
+            Context context,
             IMapper mapper,
             ILogger<ListingPaymentMethodsServices> logger)
         {
@@ -30,7 +30,7 @@ namespace Api.Infrastructure.Services.ListingPaymentMethodsServices
             {
                 var items = await _context.ListingPaymentMethods
                     .AsNoTracking()
-                    .OrderBy(x => x.ListingId)
+                    .OrderByDescending(x => x.ListingId)
                     .ThenBy(x => x.PaymentMethodId)
                     .ToListAsync();
 

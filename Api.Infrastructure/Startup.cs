@@ -1,6 +1,9 @@
 ﻿
 using Api.Infrastructure.Services.Categories;
+
+//using Api.Infrastructure.Services.Dynamic;
 using Api.Infrastructure.Services.Listings;
+using Api.Infrastructure.Services.Roles;
 using Api.Shared.Data;
 using Api.Shared.ServiciosExternos;
 using Microsoft.AspNetCore.Http.Connections;
@@ -62,7 +65,7 @@ public static class Startup
     internal static IServiceCollection AddSqlConnection(this IServiceCollection services, IConfiguration config)
     {
         var connectionString = config.GetConnectionString("SQL");
-        services.AddDbContext<ContextInfoGuia>(options => options.UseSqlServer(connectionString));
+        services.AddDbContext<Context>(options => options.UseSqlServer(connectionString));
         return services;
     }
     internal static IServiceCollection AddCorsSettings(this IServiceCollection services)
@@ -83,14 +86,19 @@ public static class Startup
     }
     internal static IServiceCollection AddServicesSettings(this IServiceCollection services)
     {
-        
+        // Servicios existentes
         services.AddTransient<IUsersServices, UsersServices>();
         services.AddTransient<IListingsServices, ListingsServices>();
         services.AddTransient<ICategorieServices, CategorieServices>();
+        services.AddTransient<IRolesServices, RolesServices>();
+
+
+
 
 
         return services;
     }
+
     internal static IServiceCollection AddSignalRSettings(this IServiceCollection services)
     {
         services.AddSignalR();

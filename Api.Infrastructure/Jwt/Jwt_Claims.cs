@@ -21,6 +21,7 @@
         public string? Status { get; set; } = default!;
         public string? LastName { get; set; } = default!;
         public int? TenantId { get; set; } = default!;
+        public string ImgProfile { get; set; }
 
         public List<Jwt_Claims_BracnhOffice> BranchOffices { get; set; } = default!;
 

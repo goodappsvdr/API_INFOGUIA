@@ -12,4 +12,17 @@ public class AddListingServicesDTO
     public int ListingId { get; set; }
     public int ServiceId { get; set; }
 }
+public class AddListingServicesCompleteDTO
+{
+ 
+    public int ServiceId { get; set; }
+}
 
+
+
+public class GetListingServices
+{
+
+    public int ServiceId { get; set; }
+    public DateTime CreatedAt { get; set; }
+}
