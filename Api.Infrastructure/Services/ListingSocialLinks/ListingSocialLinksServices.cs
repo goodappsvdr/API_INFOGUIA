@@ -69,7 +69,7 @@ namespace Api.Infrastructure.Services.ListingSocialLinks
             var links = await _context.ListingSocialLinks
                 .AsNoTracking()
                 .Where(x => x.ListingId == listingId && x.IsActive)
-                .OrderBy(x => x.SortOrder)
+                .OrderByDescending(x => x.ListingSocialLinkId)
                 .ToListAsync();
 
             return _mapper.Map<List<ListingSocialLinksDto>>(links);

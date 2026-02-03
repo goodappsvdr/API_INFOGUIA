@@ -18,8 +18,4 @@ public partial class Province
     public bool IsActive { get; set; }
 
     public DateTime CreatedAt { get; set; }
-
-    public virtual ICollection<City> Cities { get; set; } = new List<City>();
-
-    public virtual Country Country { get; set; } = null!;
 }

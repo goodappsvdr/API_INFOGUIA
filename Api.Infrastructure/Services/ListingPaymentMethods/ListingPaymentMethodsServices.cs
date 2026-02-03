@@ -30,7 +30,7 @@ namespace Api.Infrastructure.Services.ListingPaymentMethodsServices
             {
                 var items = await _context.ListingPaymentMethods
                     .AsNoTracking()
-                    .OrderBy(x => x.ListingId)
+                    .OrderByDescending(x => x.ListingId)
                     .ThenBy(x => x.PaymentMethodId)
                     .ToListAsync();
 

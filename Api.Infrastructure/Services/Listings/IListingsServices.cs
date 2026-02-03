@@ -4,9 +4,10 @@ namespace Api.Infrastructure.Services.Listings
 {
     public interface IListingsServices
     {
-        Task<ListingDTO> CreateListingAsync(string userId, AddListingDTO listingDto);
-        Task<List<ListingDTO>> GetAllListingsAsync();
+        Task<ListingDTO> CreateListingAsync(int userId, AddListingDTO listingDto);
+        Task<GetAllListingsResult> GetAllListingsAsync();
         Task<ListingDTO> GetListingByIdAsync(int id);
-        Task<ListingDTO> UpdateListingAsync(string userId, ListingDTO listingDto);
+        Task<GetAllListingsByResult> GetListingsByCategoryIdAsync(int categoryId);
+        Task<ListingDTO> UpdateListingAsync(int userId, UpdateListingDTO listingDto, int listingId);
     }
 }

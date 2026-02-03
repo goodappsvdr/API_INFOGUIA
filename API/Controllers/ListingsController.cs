@@ -43,12 +43,12 @@ namespace API.Controllers
         {
             try
             {
-                var userId = HttpContext.GetUserId();
+                var userId = int.Parse(HttpContext.GetUserId());
                 var createdListing = await _listingsServices.CreateListingAsync(userId, listingDto);
 
                 return CreatedAtAction(
                     nameof(GetListingById),
-                    new { id = createdListing.Id },
+                    new { id = createdListing.UserId},
                     ApiResponse<ListingDTO>.SuccessResponse(createdListing, "Listing created successfully")
                 );
             }
@@ -67,27 +67,32 @@ namespace API.Controllers
         /// <summary>
         /// Gets all listings
         /// </summary>
-        /// <returns>List of all listings</returns>
-        /// <response code="200">Returns the list of listings</response>
+        /// <returns>Listings with total count</returns>
+        /// <response code="200">Returns the listings and total count</response>
         /// <response code="401">Unauthorized</response>
         [HttpGet]
-        [ProducesResponseType(typeof(ApiResponse<List<ListingDTO>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<GetAllListingsResult>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllListings()
         {
             try
             {
-                var listings = await _listingsServices.GetAllListingsAsync();
-                return Ok(ApiResponse<List<ListingDTO>>.SuccessResponse(
-                    listings,
-                    $"{listings.Count} listing(s) found"
+                var result = await _listingsServices.GetAllListingsAsync();
+
+                return Ok(ApiResponse<GetAllListingsResult>.SuccessResponse(
+                    result,
+                    $"{result.TotalCount} listing(s) found"
                 ));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving listings");
-                return StatusCode(500, ApiResponse<object>.ErrorResponse("An error occurred while retrieving listings"));
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    ApiResponse<object>.ErrorResponse("An error occurred while retrieving listings")
+                );
             }
         }
+
 
         /// <summary>
         /// Gets a specific listing by ID
@@ -123,10 +128,10 @@ namespace API.Controllers
         /// Updates an existing listing
         /// </summary>
         /// <param name="id">Listing ID</param>
-        /// <param name="listingDto">Updated listing data</param>
+        /// <param name="listingDto">Updated listing data (UpdateListingDTO)</param>
         /// <returns>Updated listing</returns>
         /// <response code="200">Listing updated successfully</response>
-        /// <response code="400">Invalid data or ID mismatch</response>
+        /// <response code="400">Invalid data</response>
         /// <response code="403">User doesn't own this listing</response>
         /// <response code="404">Listing not found</response>
         [HttpPut("{id}")]
@@ -134,17 +139,16 @@ namespace API.Controllers
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status403Forbidden)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdateListing(int id, [FromBody] ListingDTO listingDto)
+        // CAMBIO: Usamos UpdateListingDTO en el Body y eliminamos el parámetro extra listingId
+        public async Task<IActionResult> UpdateListing(int id, [FromBody] UpdateListingDTO listingDto)
         {
             try
             {
-                if (id != listingDto.Id)
-                {
-                    return BadRequest(ApiResponse<object>.ErrorResponse("ID in URL doesn't match ID in body"));
-                }
+                // El ID viene de la URL ({id}), se lo pasamos directamente al servicio
+                var userId = int.Parse(HttpContext.GetUserId());
 
-                var userId = HttpContext.GetUserId();
-                var updatedListing = await _listingsServices.UpdateListingAsync(userId, listingDto);
+                // CAMBIO: Enviamos 'id' como el identificador del listing
+                var updatedListing = await _listingsServices.UpdateListingAsync(userId, listingDto, id);
 
                 return Ok(ApiResponse<ListingDTO>.SuccessResponse(updatedListing, "Listing updated successfully"));
             }
@@ -169,6 +173,33 @@ namespace API.Controllers
                 return StatusCode(500, ApiResponse<object>.ErrorResponse("An error occurred while updating the listing"));
             }
         }
+
+        /// <summary>
+        /// Obtiene los listings por id categoria
+        /// </summary>
+        [Authorize, HttpGet("GetListingsByCategoryId")]
+        [ProducesResponseType(typeof(ApiResponse<GetAllListingsByResult>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetListingsByCategoryIdAsync(int categoryId)
+        {
+            try
+            {
+                var result = await _listingsServices.GetListingsByCategoryIdAsync(categoryId);
+
+                return Ok(ApiResponse<GetAllListingsByResult>.SuccessResponse(
+                    result,
+                    $"{result.TotalCount} listing(s) found"
+                ));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving listings");
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    ApiResponse<object>.ErrorResponse("An error occurred while retrieving listings")
+                );
+            }
+        }
+
 
     }
 }

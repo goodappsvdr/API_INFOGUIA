@@ -28,7 +28,7 @@ namespace Api.Infrastructure.Services.ListingPhones
             {
                 var phones = await _context.ListingPhones
                     .AsNoTracking()
-                    .OrderBy(p => p.SortOrder)
+                    .OrderByDescending(p => p.ListingPhoneId)
                     .ToListAsync();
 
                 return _mapper.Map<List<ListingPhonesDto>>(phones);

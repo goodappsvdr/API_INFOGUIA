@@ -7,6 +7,7 @@ using Api.Shared.DTOs.Listings;
 using Api.Shared.DTOs.ListingServices;
 using Api.Shared.DTOs.ListingSocialLinks;
 using Api.Shared.DTOs.Roles;
+using Api.Shared.DTOs.Users;
 using Api.Shared.Models;
 using MimeKit;
 
@@ -36,7 +37,7 @@ namespace Api.Infrastructure.AutoMapper
 
             // Listing -> ListingDTO
             CreateMap<Listing, ListingDTO>()
-                .ForMember(d => d.Id, o => o.MapFrom(s => s.ListingId))
+                .ForMember(d => d.ListingId, o => o.MapFrom(s => s.ListingId))
                 .ForMember(d => d.LogoUrl, o => o.MapFrom(s => s.LogoUrl ?? string.Empty))
                 .ForMember(d => d.Address, o => o.MapFrom(s => s.Address ?? string.Empty));
 
@@ -226,13 +227,14 @@ namespace Api.Infrastructure.AutoMapper
 
             // ========== ROLES ==========
 
-
             // CreateRoleDto -> Role (entidad)
             CreateMap<CreateRoleDto, Role>()
                 .ForMember(d => d.RoleId, o => o.Ignore()); // El ID se genera automáticamente
 
             // Role (entidad) -> RoleDto
             CreateMap<Role, RoleDto>();
+
+            CreateMap<UpdateRoleDto, Role>();
 
 
             // ========== CATEGORIES ==========
@@ -263,6 +265,29 @@ namespace Api.Infrastructure.AutoMapper
             CreateMap<Category, CategoryWithStatsDTO>()
                 .ForMember(d => d.Id, o => o.MapFrom(s => s.CategoryId))
                 .ForMember(d => d.ListingCount, o => o.Ignore()); // Se calcula manualmente usualmente
+
+
+            // ========== USERS ==========
+
+            // 1. Mapeo para lectura y creación (No lo tocamos para no romper el Crear)
+            CreateMap<User, UserDto>()
+                .ForMember(dest => dest.userId, opt => opt.MapFrom(src => src.UserId));
+
+            CreateMap<UserDto, User>();
+
+            // 2. NUEVO: Mapeo específico para actualización (UpdateUserDto -> User)
+            // Esto es lo que necesita tu método UpdateUserAsync
+            CreateMap<UpdateUserDto, User>()
+                .ForMember(dest => dest.UserId, opt => opt.Ignore())       // Protege la PK
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())    // No borra fecha de creación
+                .ForMember(dest => dest.CreatedByUserId, opt => opt.Ignore())
+                .ForMember(dest => dest.ModifiedAt, opt => opt.Ignore())   // Se asigna en el Service
+                .ForMember(dest => dest.ModifiedByUserId, opt => opt.Ignore())
+                // Si el password llega vacío desde el front, no pisa el que ya existe en la DB
+                .ForMember(dest => dest.PasswordHash, opt => opt.Condition(src => !string.IsNullOrEmpty(src.password)));
+
+            // 3. NUEVO: Mapeo inverso para el retorno del Service (User -> UpdateUserDto)
+            CreateMap<User, UpdateUserDto>();
         }
     }
 }

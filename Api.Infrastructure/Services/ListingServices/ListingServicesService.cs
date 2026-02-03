@@ -74,7 +74,7 @@ namespace Api.Infrastructure.Services.ListingServices
             var services = await _context.ListingServices
                 .AsNoTracking()
                 .Where(x => x.ListingId == listingId)
-                .OrderBy(x => x.ServiceId)
+                .OrderByDescending(x => x.ListingId)
                 .ToListAsync();
 
             return _mapper.Map<List<ListingServicesDto>>(services);

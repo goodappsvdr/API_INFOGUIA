@@ -34,7 +34,7 @@ public class CategorieServices : ICategorieServices
         {
             var categories = await _context.Categories
                 .AsNoTracking()
-                .OrderBy(c => c.Name)
+                .OrderByDescending(c => c.CategoryId)
                 .ToListAsync();
 
             _logger.LogInformation("Retrieved {Count} categories", categories.Count);

@@ -13,7 +13,7 @@ namespace Api.Infrastructure.Services.Roles
         private readonly ILogger<RolesServices> _logger;
 
         public RolesServices(
-                Context  context,
+            Context context,
             IMapper mapper,
             ILogger<RolesServices> logger)
         {
@@ -25,25 +25,20 @@ namespace Api.Infrastructure.Services.Roles
         // ===================== CREATE =====================
         public async Task<RoleDto> CreateAsync(CreateRoleDto dto)
         {
+            if (string.IsNullOrWhiteSpace(dto.Name))
+                throw new BadRequestException("El nombre del rol es obligatorio.");
+
             var duplicated = await _context.Roles
                 .AnyAsync(x => x.Name.ToLower() == dto.Name.ToLower());
-            if (duplicated)
-                throw new BadRequestException($"The role '{dto.Name}' already exists.");
 
-            // CreateRoleDto → Role (entidad de BD)
+            if (duplicated)
+                throw new BadRequestException($"El rol '{dto.Name}' ya existe.");
+
             var entity = _mapper.Map<Role>(dto);
 
-            // Agregar a la BD
             _context.Roles.Add(entity);
             await _context.SaveChangesAsync();
 
-            _logger.LogInformation(
-                "New role created: {RoleName} with ID {Id}",
-                entity.Name,
-                entity.RoleId
-            );
-
-            // Role (entidad) → RoleDto (para devolver)
             return _mapper.Map<RoleDto>(entity);
         }
 
@@ -54,7 +49,7 @@ namespace Api.Infrastructure.Services.Roles
         {
             var roles = await _context.Roles
                 .AsNoTracking()
-                .OrderBy(x => x.Name)
+                .OrderByDescending(x => x.RoleId)
                 .ToListAsync();
 
             return _mapper.Map<List<RoleDto>>(roles);
@@ -75,32 +70,31 @@ namespace Api.Infrastructure.Services.Roles
         }
 
         // ===================== UPDATE =====================
-
         public async Task<RoleDto> UpdateAsync(int id, UpdateRoleDto dto)
         {
-            if (id != dto.RoleId)
-                throw new BadRequestException("ID mismatch");
+            if (string.IsNullOrWhiteSpace(dto.Name))
+                throw new BadRequestException("El nombre del rol es obligatorio.");
 
-            var entity = await _context.Roles
-                .FirstOrDefaultAsync(x => x.RoleId == id);
+            var entity = await _context.Roles.FindAsync(id);
 
             if (entity == null)
-                throw new NotFoundException($"Role with ID {id} not found");
+                throw new KeyNotFoundException($"No se encontró el rol con ID {id}.");
 
-            // Validar que el nuevo nombre no lo tenga otro rol
-            var nameExists = await _context.Roles
-                .AnyAsync(x => x.Name.ToLower() == dto.Name.ToLower() && x.RoleId != id);
+            var duplicated = await _context.Roles
+                .AnyAsync(x => x.RoleId != id && x.Name.ToLower() == dto.Name.ToLower());
 
-            if (nameExists)
-                throw new BadRequestException($"The role name '{dto.Name}' is already in use.");
+            if (duplicated)
+                throw new BadRequestException($"El rol '{dto.Name}' ya existe.");
 
+            // Mapear cambios
             _mapper.Map(dto, entity);
-            await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Role {Id} updated successfully", id);
+            _context.Roles.Update(entity);
+            await _context.SaveChangesAsync();
 
             return _mapper.Map<RoleDto>(entity);
         }
+
 
         // ===================== DELETE =====================
 

@@ -30,7 +30,7 @@ namespace Api.Infrastructure.Services.ListingHoursServices
             {
                 var hours = await _context.ListingHours
                     .AsNoTracking()
-                    .OrderBy(x => x.ListingId)
+                    .OrderByDescending(x => x.ListingId)
                     .ThenBy(x => x.DayOfWeek)
                     .ThenBy(x => x.OpenTime)
                     .ToListAsync();

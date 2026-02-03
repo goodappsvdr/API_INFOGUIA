@@ -15,7 +15,8 @@ namespace Api.Infrastructure.Services.ListingImagesServices
         private readonly ILogger<ListingImagesServices> _logger;
 
         public ListingImagesServices(
-            Context  context,
+            Context context,
+
             IMapper mapper,
             ILogger<ListingImagesServices> logger)
         {
@@ -30,7 +31,7 @@ namespace Api.Infrastructure.Services.ListingImagesServices
             {
                 var images = await _context.ListingImages
                     .AsNoTracking()
-                    .OrderBy(x => x.SortOrder)
+                    .OrderByDescending(x => x.ListingImageId)
                     .ToListAsync();
 
                 return _mapper.Map<List<ListingImagesDto>>(images);

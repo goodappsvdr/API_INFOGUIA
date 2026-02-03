@@ -20,14 +20,4 @@ public partial class Tenant
     public DateTime? ModifiedAt { get; set; }
 
     public int? ModifiedByUserId { get; set; }
-
-    public virtual ICollection<Category> Categories { get; set; } = new List<Category>();
-
-    public virtual City City { get; set; } = null!;
-
-    public virtual User? CreatedByUser { get; set; }
-
-    public virtual User? ModifiedByUser { get; set; }
-
-    public virtual ICollection<User> Users { get; set; } = new List<User>();
 }
