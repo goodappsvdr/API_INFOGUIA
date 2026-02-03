@@ -22,8 +22,6 @@ public partial class Context : DbContext
 
     public virtual DbSet<Country> Countries { get; set; }
 
-
-
     public virtual DbSet<Listing> Listings { get; set; }
 
     public virtual DbSet<ListingDirectory> ListingDirectories { get; set; }
@@ -134,11 +132,6 @@ public partial class Context : DbContext
             entity.Property(e => e.Name).HasMaxLength(100);
         });
 
-
-
-     
-
-     
         modelBuilder.Entity<Listing>(entity =>
         {
             entity.HasKey(e => e.ListingId).HasName("PK__Listings__BF3EBEF015E53387");
@@ -235,12 +228,13 @@ public partial class Context : DbContext
 
         modelBuilder.Entity<ListingService>(entity =>
         {
-            entity.HasKey(e => new { e.ListingId, e.ServiceId }).HasName("PK__ListingS__036F05FE36A3A0AF");
+            entity.HasKey(e => e.ListingServiceId).HasName("PK_ListingServices_1");
 
-            entity.Property(e => e.ListingId).HasColumnName("ListingID");
-            entity.Property(e => e.ServiceId).HasColumnName("ServiceID");
+            entity.Property(e => e.ListingServiceId).HasColumnName("ListingServiceID");
             entity.Property(e => e.CreatedByUserId).HasColumnName("CreatedByUserID");
+            entity.Property(e => e.ListingId).HasColumnName("ListingID");
             entity.Property(e => e.ModifiedByUserId).HasColumnName("ModifiedByUserID");
+            entity.Property(e => e.ServiceId).HasColumnName("ServiceID");
         });
 
         modelBuilder.Entity<ListingSocialLink>(entity =>
@@ -309,6 +303,9 @@ public partial class Context : DbContext
         modelBuilder.Entity<Role>(entity =>
         {
             entity.Property(e => e.RoleId).HasColumnName("RoleID");
+            entity.Property(e => e.CreatedByUserId).HasColumnName("CreatedByUserID");
+            entity.Property(e => e.IsActive).HasColumnName("isActive");
+            entity.Property(e => e.ModifiedByUserId).HasColumnName("ModifiedByUserID");
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
                 .IsUnicode(false);
