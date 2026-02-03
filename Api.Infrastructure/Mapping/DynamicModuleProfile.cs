@@ -11,8 +11,8 @@ public class DynamicModuleProfile : Profile
     public DynamicModuleProfile()
     {
         // Dynamic Module mappings
-        CreateMap<DynamicModule, DynamicModuleDTO>()
-            .ForMember(dest => dest.Fields, opt => opt.MapFrom(src => src.DynamicFields.OrderBy(f => f.SortOrder)));
+        //CreateMap<DynamicModule, DynamicModuleDTO>()
+        //    .ForMember(dest => dest.Fields, opt => opt.MapFrom(src => src.DynamicFields.OrderBy(f => f.SortOrder)));
 
         CreateMap<AddDynamicModuleDTO, DynamicModule>()
             .ForMember(dest => dest.ModuleId, opt => opt.Ignore())
@@ -20,8 +20,7 @@ public class DynamicModuleProfile : Profile
             .ForMember(dest => dest.CreatedByUserId, opt => opt.Ignore())
             .ForMember(dest => dest.ModifiedAt, opt => opt.Ignore())
             .ForMember(dest => dest.ModifiedByUserId, opt => opt.Ignore())
-            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
-            .ForMember(dest => dest.DynamicFields, opt => opt.MapFrom(src => src.Fields));
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true));
 
         CreateMap<UpdateDynamicModuleDTO, DynamicModule>()
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
@@ -29,8 +28,7 @@ public class DynamicModuleProfile : Profile
             .ForMember(dest => dest.ModifiedAt, opt => opt.Ignore())
             .ForMember(dest => dest.ModifiedByUserId, opt => opt.Ignore())
             .ForMember(dest => dest.TableName, opt => opt.Ignore()) // No permitir cambiar nombre de tabla
-            .ForMember(dest => dest.EntityName, opt => opt.Ignore()) // No permitir cambiar nombre de entidad
-            .ForMember(dest => dest.DynamicFields, opt => opt.Ignore()); // Los campos se manejan por separado
+            .ForMember(dest => dest.EntityName, opt => opt.Ignore()); // No permitir cambiar nombre de entidad
 
         // Dynamic Field mappings
         CreateMap<DynamicField, DynamicFieldDTO>();
@@ -40,14 +38,12 @@ public class DynamicModuleProfile : Profile
             .ForMember(dest => dest.ModuleId, opt => opt.Ignore())
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.CreatedByUserId, opt => opt.Ignore())
-            .ForMember(dest => dest.SortOrder, opt => opt.Ignore()) // Se asigna en el servicio
-            .ForMember(dest => dest.Module, opt => opt.Ignore());
+            .ForMember(dest => dest.SortOrder, opt => opt.Ignore()); // Se asigna en el servicio
 
         CreateMap<UpdateDynamicFieldDTO, DynamicField>()
             .ForMember(dest => dest.ModuleId, opt => opt.Ignore())
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.CreatedByUserId, opt => opt.Ignore())
-            .ForMember(dest => dest.Module, opt => opt.Ignore())
             // Campos que no se pueden cambiar en una actualización
             .ForMember(dest => dest.ColumnName, opt => opt.Ignore())
             .ForMember(dest => dest.DataType, opt => opt.Ignore())
@@ -68,8 +64,7 @@ public class DynamicModuleProfile : Profile
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
             .ForMember(dest => dest.CreatedByUserId, opt => opt.Ignore())
             .ForMember(dest => dest.ModifiedAt, opt => opt.Ignore())
-            .ForMember(dest => dest.ModifiedByUserId, opt => opt.Ignore())
-            .ForMember(dest => dest.DynamicFields, opt => opt.Ignore());
+            .ForMember(dest => dest.ModifiedByUserId, opt => opt.Ignore());
 
         CreateMap<UpdateDynamicFieldDTO, DynamicField>()
             .ForMember(dest => dest.FieldId, opt => opt.Ignore())
@@ -85,8 +80,7 @@ public class DynamicModuleProfile : Profile
             .ForMember(dest => dest.IsIdentity, opt => opt.Ignore())
             .ForMember(dest => dest.DefaultValue, opt => opt.Ignore())
             .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
-            .ForMember(dest => dest.CreatedByUserId, opt => opt.Ignore())
-            .ForMember(dest => dest.Module, opt => opt.Ignore());
+            .ForMember(dest => dest.CreatedByUserId, opt => opt.Ignore());
     }
 }
 

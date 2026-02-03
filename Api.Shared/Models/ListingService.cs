@@ -5,9 +5,11 @@ namespace Api.Shared.Models;
 
 public partial class ListingService
 {
-    public int ListingId { get; set; }
+    public int ListingServiceId { get; set; }
 
     public int ServiceId { get; set; }
+
+    public int ListingId { get; set; }
 
     public DateTime CreatedAt { get; set; }
 

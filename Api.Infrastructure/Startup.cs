@@ -1,14 +1,16 @@
 ﻿using Api.Infrastructure.Mapping;
 using Api.Infrastructure.Services.Categories;
-using Api.Infrastructure.Services.Dynamic;
+//using Api.Infrastructure.Services.Dynamic;
 
 //using Api.Infrastructure.Services.Dynamic;
 using Api.Infrastructure.Services.Listings;
+using Api.Infrastructure.Services.ListingImages;
 using Api.Infrastructure.Services.Roles;
 using Api.Shared.Data;
 using Api.Shared.ServiciosExternos;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Api.Infrastructure.Services.ListingImagesServices;
 
 namespace Api.Infrastructure;
 public static class Startup
@@ -90,14 +92,15 @@ public static class Startup
         // Servicios existentes
         services.AddTransient<IUsersServices, UsersServices>();
         services.AddTransient<IListingsServices, ListingsServices>();
+        services.AddTransient<IListingImagesServices, ListingImagesServices>();
         services.AddTransient<ICategorieServices, CategorieServices>();
         services.AddTransient<IRolesServices, RolesServices>();
 
         // ✅ AGREGAR: Servicios del sistema dinámico ABM
-        services.AddScoped<IDynamicModuleService, DynamicModuleService>();
-        services.AddScoped<IDynamicEntityService, DynamicEntityService>();
-        services.AddScoped<IDynamicDatabaseService, DynamicDatabaseService>();
-        services.AddScoped<IDynamicMappingService, DynamicMappingService>();
+        //services.AddScoped<IDynamicModuleService, DynamicModuleService>();
+        //services.AddScoped<IDynamicEntityService, DynamicEntityService>();
+        //services.AddScoped<IDynamicDatabaseService, DynamicDatabaseService>();
+        //services.AddScoped<IDynamicMappingService, DynamicMappingService>();
 
         // ✅ AGREGAR: AutoMapper profile si no lo tienes ya registrado
         services.AddAutoMapper(typeof(DynamicModuleProfile));
