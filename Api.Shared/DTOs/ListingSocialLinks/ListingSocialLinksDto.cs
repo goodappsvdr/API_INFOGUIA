@@ -38,4 +38,13 @@ namespace Api.Shared.DTOs.ListingSocialLinks
         public int SortOrder { get; set; }
         public bool IsActive { get; set; }
     }
+
+    public class GetListingSocialLinks
+    {
+        public int ListingSocialLinkID { get; set; }
+        public string NetworkName { get; set; } = null!;
+        public string? ProfileUrl { get; set; }
+    }
+
+
 }
