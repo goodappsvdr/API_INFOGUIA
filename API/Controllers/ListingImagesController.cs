@@ -5,6 +5,9 @@ using Api.Shared.DTOs;
 using API.Extensions;
 using API.Filters;
 using Microsoft.AspNetCore.Mvc;
+using Api.Shared.Data;
+using Api.Shared.Models;
+using System.IO;
 
 namespace API.Controllers
 {
@@ -18,13 +21,16 @@ namespace API.Controllers
     {
         private readonly IListingImagesServices _listingImagesServices;
         private readonly ILogger<ListingImagesController> _logger;
+        private readonly Context _context; // 👈 añadimos el DbContext
 
         public ListingImagesController(
             IListingImagesServices listingImagesServices,
-            ILogger<ListingImagesController> logger)
+            ILogger<ListingImagesController> logger,
+             Context context)
         {
             _listingImagesServices = listingImagesServices;
             _logger = logger;
+            _context = context;
         }
 
         /// <summary>
@@ -135,6 +141,88 @@ namespace API.Controllers
             {
                 _logger.LogError(ex, "Error updating listing image {ImageId}", id);
                 return StatusCode(500, ApiResponse<object>.ErrorResponse("Error updating listing image"));
+            }
+        }
+
+        /// <summary>
+        /// Crear Imagen de Listing
+        /// </summary>
+        [HttpPost("CreateListingImageUrl")]
+        public async Task<ActionResult> CreateListingImageUrlAsync([FromForm] ListingImageUploadRequest request)
+        {
+            // 1. Validaciones de seguridad
+            if (request.ImageFile == null || request.ImageFile.Length == 0)
+            {
+                return BadRequest("No se ha proporcionado ninguna imagen.");
+            }
+
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp" };
+            var extension = Path.GetExtension(request.ImageFile.FileName).ToLowerInvariant();
+
+            if (!allowedExtensions.Contains(extension))
+            {
+                return BadRequest("Formato de imagen no permitido (solo JPG, PNG, WebP).");
+            }
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            string fullPath = string.Empty;
+
+            try
+            {
+                // 2. Preparar el nombre y rutas
+                var fileName = $"listing_{request.ListingId}_{Guid.NewGuid()}{extension}";
+                var folderPath = Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "Imagenes", "Listings");
+                fullPath = Path.Combine(folderPath, fileName);
+
+                if (!System.IO.Directory.Exists(folderPath))
+                {
+                    System.IO.Directory.CreateDirectory(folderPath);
+                }
+
+                // 3. Guardar archivo físico
+                using (var stream = new FileStream(fullPath, FileMode.Create))
+                {
+                    await request.ImageFile.CopyToAsync(stream);
+                }
+
+                // 4. Construir URL dinámica (se adapta a api.infoguia.online o localhost)
+                var baseUrl = $"{Request.Scheme}://{Request.Host}";
+                var imageUrl = $"{baseUrl}/Imagenes/Listings/{fileName}";
+
+                // 5. Mapear al modelo de base de datos
+                var model = new ListingImage
+                {
+                    ListingId = request.ListingId,
+                    ImageUrl = imageUrl,
+                    Caption = request.Caption,
+                    SortOrder = 0,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedByUserId = request.UserId.ToString()
+                };
+
+                _context.ListingImages.Add(model);
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+
+                return Ok(new
+                {
+                    ListingImageId = model.ListingImageId,
+                    imageUrl = imageUrl
+                });
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+
+                // Limpieza: si falló la DB pero el archivo se guardó, lo borramos
+                if (!string.IsNullOrEmpty(fullPath) && System.IO.File.Exists(fullPath))
+                {
+                    System.IO.File.Delete(fullPath);
+                }
+
+                return BadRequest($"Error interno: {ex.Message}");
             }
         }
     }
